@@ -230,4 +230,4 @@ def setup_theme(dark: bool = True) -> None:
 
     ariel.set("theme_settings", "prospero_dark_mode", dark)
     stored = ariel.get("theme_settings", "prospero_dark_mode")
-    ui.dark_mode(False)
+    ui.dark_mode(stored)
