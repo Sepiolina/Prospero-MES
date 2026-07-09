@@ -37,12 +37,20 @@ class FocusRouter:
         field.on("keydown.enter", lambda _, i=index: self._advance(i))
 
     def on_complete(self, callback: Callable[[], None]) -> None:
-        """Callback fired when Enter is pressed on the last field in the
-        sequence (i.e. there is no `index + 1` registered).
-        """
         self._on_complete = callback
 
     def _advance(self, current_index: int) -> None:
+        current_field = self._fields.get(current_index)
+
+        if current_field is not None:
+            if hasattr(current_field, "validate"):
+                if not current_field.validate():
+                    return
+            elif hasattr(current_field, "is_valid"):
+                if not current_field.is_valid():
+                    return
+        # -------------------------------------------
+
         higher_keys = [k for k in self._fields.keys() if k > current_index]
         if higher_keys:
             next_index = min(higher_keys)
@@ -57,10 +65,6 @@ class FocusRouter:
             self._on_complete()
 
     def focus_first(self) -> None:
-        """
-        Resets routing focus sequences strictly returning UI flow focus and enabled constraints
-        back down to lowest/starting component mapped in FocusRouter dictionary map natively
-        """
         if not self._fields:
             return
 
