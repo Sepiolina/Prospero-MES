@@ -2,15 +2,21 @@ import logging
 from typing import Any, Dict, List, Optional
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.exc import SQLAlchemyError
+from . import security
 from .database import SessionLocal
 from .models import DynamicStore, DynamicLog
+from .memory import InMemoryStore, remember as _default_remember
 
 logger = logging.getLogger(__name__)
 
 
 class ArielClient:
-    def __init__(self, session_factory=SessionLocal):
+    def __init__(
+        self, session_factory=SessionLocal, memory_store: Optional[InMemoryStore] = None
+    ):
         self.session_factory = session_factory
+        self.remember = memory_store if memory_store is not None else _default_remember
+        self.security = security
 
     def set(self, namespace: str, key: str, value: Any) -> bool:
         try:
@@ -19,7 +25,6 @@ class ArielClient:
                     namespace=namespace, key=key, value=value
                 )
 
-                # Native SQLite Upsert prevents double-querying the database
                 do_update_stmt = stmt.on_conflict_do_update(
                     index_elements=["namespace", "key"],
                     set_=dict(value=stmt.excluded.value),
