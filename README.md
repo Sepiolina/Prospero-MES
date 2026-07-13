@@ -1,5 +1,6 @@
 # Prospero-MES
-[![CI](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_main_verification/badge.svg)](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_main_verification.yml)
+[![CI Monthly Patch](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_monthly_patch.yml/badge.svg)](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_monthly_patch.yml)
+[![CI Main](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_main_verification.yml/badge.svg)](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_main_verification.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
