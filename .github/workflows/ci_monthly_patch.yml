@@ -1,4 +1,4 @@
-name: Monthly Patch (pip-audit)
+name: ci/ Monthly Patch (pip-audit)
 
 on:
   schedule:
