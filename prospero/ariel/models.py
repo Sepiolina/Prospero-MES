@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import logging
 from typing import Any, Dict, Optional
-from sqlalchemy import String, DateTime, JSON, Integer, Text, TypeDecorator
+from sqlalchemy import String, DateTime, Integer, Text, TypeDecorator
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base, engine

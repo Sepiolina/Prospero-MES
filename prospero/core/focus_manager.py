@@ -15,7 +15,7 @@ routing indices are scoped per-screen rather than globally.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Optional
 
 
 class FocusRouter:
