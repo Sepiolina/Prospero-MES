@@ -47,7 +47,7 @@ jobs:
 
       - name: Static security analysis (bandit)
         shell: bash
-        run: bandit -r . -ll -exclude ./tests     
+        run: bandit -r . -ll   
         
   # -------------------------------------------------------------
   # JOB 2: Unit tests + desktop smoke tests (Linux & Windows)
