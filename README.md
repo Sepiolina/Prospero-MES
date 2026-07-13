@@ -1,5 +1,11 @@
 # Prospero-MES
+[![CI Monthly Patch](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_monthly_patch.yml/badge.svg)](https://github.com/Sepiolina/Prospero-MES/actions/workflows/ci_monthly_patch.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+
+
 Prospero-MES is a Python-based Manufacturing Execution System.
+
 
 ## Features
 - Client & Database Integration
@@ -7,10 +13,18 @@ Prospero-MES is a Python-based Manufacturing Execution System.
 - Logging Capability
 
 ## Project Structure
-- `prospero/`: Core application logic and modules.
-- `tests`: Comprehensive test suites verifying client and database functionality.
-- `static`: Static assets, including PDF rendering components (`pdfjs`)
-- `main.py`: Entry point and usage examples for running the system.
+
+```text
+Prospero-MES/
+├── .github/workflows/
+├── prospero/                # Core application codebase
+├── static/                  # Static assets and UI elements
+├── tests/                   # Automated unit and integration test suites
+├── docs/                    # Documentation
+├── main.py                  # System entry point and orchestration example
+├── pyproject.toml           # Project metadata and tooling configuration
+└── requirements.txt         # Project dependencies
+```
 
 ## Getting Started
 
