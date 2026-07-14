@@ -1,3 +1,5 @@
+*.c linguist-language=C
+
 # Language Detection overrides
 *.js linguist-detectable=true
 *.c linguist-detectable=true
