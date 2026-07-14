@@ -28,13 +28,15 @@ ACCOUNT_NAME: str = _unscramble("DiY0KTA4YTMvJyY6MTA2OyVfJQ==")
 def get_robust_machine_id() -> str:
     try:
         if sys.platform == "win32":
-            cmd = "wmic csproduct get uuid"
-            output = subprocess.check_output(cmd, shell=True).decode()
+            cmd = ["wmic", "csproduct", "get", "uuid"]
+            output = subprocess.check_output(cmd).decode()
             return output.split("\n")[1].strip()
         elif sys.platform == "darwin":
-            cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
-            output = subprocess.check_output(cmd, shell=True).decode()
-            return output.split('"')[-2].strip()
+            cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+            output = subprocess.check_output(cmd).decode()
+            for line in output.split("\n"):
+                if "IOPlatformUUID" in line:
+                    return line.split('"')[-2].strip()
         else:
             for path in [
                 "/sys/class/dmi/id/product_uuid",

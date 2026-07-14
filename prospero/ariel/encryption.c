@@ -1532,8 +1532,8 @@ struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr;
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
 struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct___unscramble {
   PyObject_HEAD
@@ -1541,8 +1541,8 @@ struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct___unscramble {
 };
 
 
-/* "prospero/ariel/encryption.py":22
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
+/* "prospero/ariel/encryption.py":21
+ * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:
  *     decoded_bytes = base64.b64decode(scrambled_b64)
  *     return "".join(chr(b ^ key) for b in decoded_bytes)             # <<<<<<<<<<<<<<
  * 
@@ -1556,12 +1556,12 @@ struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr {
 };
 
 
-/* "prospero/ariel/encryption.py":71
+/* "prospero/ariel/encryption.py":68
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)
  * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:             # <<<<<<<<<<<<<<
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)
+ *         if raw_env:
 */
 struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_2__load {
   PyObject_HEAD
@@ -1569,8 +1569,8 @@ struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_2__load {
 };
 
 
-/* "prospero/ariel/encryption.py":100
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+/* "prospero/ariel/encryption.py":93
+ *                 obfuscated_bytes: bytes = path.read_bytes()
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                     for i, b in enumerate(obfuscated_bytes)
@@ -1590,7 +1590,7 @@ struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr {
 };
 
 
-/* "prospero/ariel/encryption.py":123
+/* "prospero/ariel/encryption.py":113
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
@@ -2039,24 +2039,6 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
 #endif
 
-/* PyObjectVectorCallKwBuilder.proto */
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-#if CYTHON_VECTORCALL
-#if PY_VERSION_HEX >= 0x03090000
-#define __Pyx_Object_Vectorcall_CallFromBuilder PyObject_Vectorcall
-#else
-#define __Pyx_Object_Vectorcall_CallFromBuilder _PyObject_Vectorcall
-#endif
-#define __Pyx_MakeVectorcallBuilderKwds(n) PyTuple_New(n)
-static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n);
-#else
-#define __Pyx_Object_Vectorcall_CallFromBuilder __Pyx_PyObject_FastCallDict
-#define __Pyx_MakeVectorcallBuilderKwds(n) __Pyx_PyDict_NewPresized(n)
-#define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
-#define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
-#endif
-
 /* PyObjectFastCallMethod.proto */
 #if CYTHON_VECTORCALL && PY_VERSION_HEX >= 0x03090000
 #define __Pyx_PyObject_FastCallMethod(name, args, nargsf) PyObject_VectorcallMethod(name, args, nargsf, NULL)
@@ -2089,15 +2071,15 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
 /* RaiseUnexpectedTypeError.proto */
 static int __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj);
 
-/* PyUnicodeContains.proto */
-static CYTHON_INLINE int __Pyx_PyUnicode_ContainsTF(PyObject* substring, PyObject* text, int eq) {
-    int result = PyUnicode_Contains(text, substring);
-    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
-}
-
 /* PySequenceContains.proto */
 static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
     int result = PySequence_Contains(seq, item);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
+
+/* PyUnicodeContains.proto */
+static CYTHON_INLINE int __Pyx_PyUnicode_ContainsTF(PyObject* substring, PyObject* text, int eq) {
+    int result = PyUnicode_Contains(text, substring);
     return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
 }
 
@@ -2210,6 +2192,24 @@ static CYTHON_INLINE PyObject* __Pyx_decode_bytes(
         as_c_string, size,
         start, stop, encoding, errors, decode_func);
 }
+
+/* PyObjectVectorCallKwBuilder.proto (used by PyObjectVectorCallMethodKwBuilder) */
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+#if CYTHON_VECTORCALL
+#if PY_VERSION_HEX >= 0x03090000
+#define __Pyx_Object_Vectorcall_CallFromBuilder PyObject_Vectorcall
+#else
+#define __Pyx_Object_Vectorcall_CallFromBuilder _PyObject_Vectorcall
+#endif
+#define __Pyx_MakeVectorcallBuilderKwds(n) PyTuple_New(n)
+static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n);
+#else
+#define __Pyx_Object_Vectorcall_CallFromBuilder __Pyx_PyObject_FastCallDict
+#define __Pyx_MakeVectorcallBuilderKwds(n) __Pyx_PyDict_NewPresized(n)
+#define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
+#define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
+#endif
 
 /* PyObjectVectorCallMethodKwBuilder.proto */
 #if CYTHON_VECTORCALL && PY_VERSION_HEX >= 0x03090000
@@ -2771,7 +2771,7 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_values;
   PyObject *__pyx_tuple[3];
   PyObject *__pyx_codeobj_tab[11];
-  PyObject *__pyx_string_tab[177];
+  PyObject *__pyx_string_tab[181];
   PyObject *__pyx_number_tab[4];
 /* #### Code section: module_state_contents ### */
 
@@ -2868,17 +2868,17 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_u__6 __pyx_string_tab[19]
 #define __pyx_kp_u__7 __pyx_string_tab[20]
 #define __pyx_kp_u_add_note __pyx_string_tab[21]
-#define __pyx_kp_u_disable __pyx_string_tab[22]
-#define __pyx_kp_u_enable __pyx_string_tab[23]
-#define __pyx_kp_u_etc_machine_id __pyx_string_tab[24]
-#define __pyx_kp_u_gc __pyx_string_tab[25]
-#define __pyx_kp_u_ioreg_rd1_c_IOPlatformExpertDevi __pyx_string_tab[26]
+#define __pyx_kp_u_c __pyx_string_tab[22]
+#define __pyx_kp_u_disable __pyx_string_tab[23]
+#define __pyx_kp_u_enable __pyx_string_tab[24]
+#define __pyx_kp_u_etc_machine_id __pyx_string_tab[25]
+#define __pyx_kp_u_gc __pyx_string_tab[26]
 #define __pyx_kp_u_isenabled __pyx_string_tab[27]
 #define __pyx_kp_u_proc_cpuinfo __pyx_string_tab[28]
 #define __pyx_kp_u_prospero_ariel_encryption_py __pyx_string_tab[29]
-#define __pyx_kp_u_static_ariel_key_fallback __pyx_string_tab[30]
-#define __pyx_kp_u_sys_class_dmi_id_product_uuid __pyx_string_tab[31]
-#define __pyx_kp_u_wmic_csproduct_get_uuid __pyx_string_tab[32]
+#define __pyx_kp_u_rd1 __pyx_string_tab[30]
+#define __pyx_kp_u_static_ariel_key_fallback __pyx_string_tab[31]
+#define __pyx_kp_u_sys_class_dmi_id_product_uuid __pyx_string_tab[32]
 #define __pyx_n_u_ACCOUNT_NAME __pyx_string_tab[33]
 #define __pyx_n_u_ARIEL_ENCRYPTION_KEY __pyx_string_tab[34]
 #define __pyx_n_u_EncryptionManager __pyx_string_tab[35]
@@ -2890,139 +2890,143 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_EncryptionManager_encrypt __pyx_string_tab[41]
 #define __pyx_n_u_EncryptionManager_rotate_reencry __pyx_string_tab[42]
 #define __pyx_n_u_Fernet __pyx_string_tab[43]
-#define __pyx_n_u_InvalidToken __pyx_string_tab[44]
-#define __pyx_n_u_List __pyx_string_tab[45]
-#define __pyx_n_u_MultiFernet __pyx_string_tab[46]
-#define __pyx_n_u_None __pyx_string_tab[47]
-#define __pyx_n_u_Optional __pyx_string_tab[48]
-#define __pyx_n_u_Path __pyx_string_tab[49]
-#define __pyx_n_u_Pyx_PyDict_NextRef __pyx_string_tab[50]
-#define __pyx_n_u_SERVICE_NAME __pyx_string_tab[51]
-#define __pyx_n_u_Serial __pyx_string_tab[52]
-#define __pyx_n_u_all __pyx_string_tab[53]
-#define __pyx_n_u_annotate __pyx_string_tab[54]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[55]
-#define __pyx_n_u_b __pyx_string_tab[56]
-#define __pyx_n_u_b64decode __pyx_string_tab[57]
-#define __pyx_n_u_base64 __pyx_string_tab[58]
-#define __pyx_n_u_build __pyx_string_tab[59]
-#define __pyx_n_u_check_output __pyx_string_tab[60]
-#define __pyx_n_u_chmod __pyx_string_tab[61]
-#define __pyx_n_u_ciphertext __pyx_string_tab[62]
-#define __pyx_n_u_class_getitem __pyx_string_tab[63]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[64]
-#define __pyx_n_u_close __pyx_string_tab[65]
-#define __pyx_n_u_cmd __pyx_string_tab[66]
-#define __pyx_n_u_cpuinfo __pyx_string_tab[67]
-#define __pyx_n_u_critical __pyx_string_tab[68]
-#define __pyx_n_u_cryptography_fernet __pyx_string_tab[69]
-#define __pyx_n_u_darwin __pyx_string_tab[70]
-#define __pyx_n_u_decode __pyx_string_tab[71]
-#define __pyx_n_u_decoded_bytes __pyx_string_tab[72]
-#define __pyx_n_u_decrypt __pyx_string_tab[73]
-#define __pyx_n_u_doc __pyx_string_tab[74]
-#define __pyx_n_u_e __pyx_string_tab[75]
-#define __pyx_n_u_encode __pyx_string_tab[76]
-#define __pyx_n_u_encrypt __pyx_string_tab[77]
-#define __pyx_n_u_encryption_manager __pyx_string_tab[78]
-#define __pyx_n_u_enumerate __pyx_string_tab[79]
-#define __pyx_n_u_env_var __pyx_string_tab[80]
-#define __pyx_n_u_environ __pyx_string_tab[81]
-#define __pyx_n_u_error __pyx_string_tab[82]
-#define __pyx_n_u_exist_ok __pyx_string_tab[83]
-#define __pyx_n_u_exists __pyx_string_tab[84]
-#define __pyx_n_u_fallback_key_path __pyx_string_tab[85]
-#define __pyx_n_u_fernet __pyx_string_tab[86]
-#define __pyx_n_u_fernets __pyx_string_tab[87]
-#define __pyx_n_u_func __pyx_string_tab[88]
-#define __pyx_n_u_generate_key __pyx_string_tab[89]
-#define __pyx_n_u_genexpr __pyx_string_tab[90]
-#define __pyx_n_u_get __pyx_string_tab[91]
-#define __pyx_n_u_getLogger __pyx_string_tab[92]
-#define __pyx_n_u_get_password __pyx_string_tab[93]
-#define __pyx_n_u_get_robust_machine_id __pyx_string_tab[94]
-#define __pyx_n_u_getnode __pyx_string_tab[95]
-#define __pyx_n_u_i __pyx_string_tab[96]
-#define __pyx_n_u_info __pyx_string_tab[97]
-#define __pyx_n_u_init __pyx_string_tab[98]
-#define __pyx_n_u_int __pyx_string_tab[99]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[100]
-#define __pyx_n_u_items __pyx_string_tab[101]
-#define __pyx_n_u_k __pyx_string_tab[102]
-#define __pyx_n_u_key __pyx_string_tab[103]
-#define __pyx_n_u_key_bytes __pyx_string_tab[104]
-#define __pyx_n_u_keyring __pyx_string_tab[105]
-#define __pyx_n_u_keys __pyx_string_tab[106]
-#define __pyx_n_u_line __pyx_string_tab[107]
-#define __pyx_n_u_load __pyx_string_tab[108]
-#define __pyx_n_u_logger __pyx_string_tab[109]
-#define __pyx_n_u_logging __pyx_string_tab[110]
-#define __pyx_n_u_machine_salt __pyx_string_tab[111]
-#define __pyx_n_u_main __pyx_string_tab[112]
-#define __pyx_n_u_metaclass __pyx_string_tab[113]
-#define __pyx_n_u_mkdir __pyx_string_tab[114]
-#define __pyx_n_u_module __pyx_string_tab[115]
-#define __pyx_n_u_name __pyx_string_tab[116]
-#define __pyx_n_u_name_2 __pyx_string_tab[117]
-#define __pyx_n_u_new_key_bytes __pyx_string_tab[118]
-#define __pyx_n_u_new_key_str __pyx_string_tab[119]
-#define __pyx_n_u_next __pyx_string_tab[120]
-#define __pyx_n_u_obfuscated_bytes __pyx_string_tab[121]
-#define __pyx_n_u_os __pyx_string_tab[122]
-#define __pyx_n_u_output __pyx_string_tab[123]
-#define __pyx_n_u_p __pyx_string_tab[124]
-#define __pyx_n_u_parent __pyx_string_tab[125]
-#define __pyx_n_u_parents __pyx_string_tab[126]
-#define __pyx_n_u_path __pyx_string_tab[127]
-#define __pyx_n_u_pathlib __pyx_string_tab[128]
-#define __pyx_n_u_plaintext __pyx_string_tab[129]
-#define __pyx_n_u_platform __pyx_string_tab[130]
-#define __pyx_n_u_pop __pyx_string_tab[131]
-#define __pyx_n_u_posix __pyx_string_tab[132]
-#define __pyx_n_u_prepare __pyx_string_tab[133]
-#define __pyx_n_u_prospero_ariel_encryption __pyx_string_tab[134]
-#define __pyx_n_u_qualname __pyx_string_tab[135]
-#define __pyx_n_u_raw_env __pyx_string_tab[136]
-#define __pyx_n_u_read_bytes __pyx_string_tab[137]
-#define __pyx_n_u_read_text __pyx_string_tab[138]
-#define __pyx_n_u_return __pyx_string_tab[139]
-#define __pyx_n_u_rotate_reencrypt __pyx_string_tab[140]
-#define __pyx_n_u_scrambled_b64 __pyx_string_tab[141]
-#define __pyx_n_u_self __pyx_string_tab[142]
-#define __pyx_n_u_send __pyx_string_tab[143]
-#define __pyx_n_u_set_name __pyx_string_tab[144]
-#define __pyx_n_u_set_password __pyx_string_tab[145]
-#define __pyx_n_u_setdefault __pyx_string_tab[146]
-#define __pyx_n_u_shell __pyx_string_tab[147]
-#define __pyx_n_u_split __pyx_string_tab[148]
-#define __pyx_n_u_staticmethod __pyx_string_tab[149]
-#define __pyx_n_u_stored_key __pyx_string_tab[150]
-#define __pyx_n_u_str __pyx_string_tab[151]
-#define __pyx_n_u_strip __pyx_string_tab[152]
-#define __pyx_n_u_subprocess __pyx_string_tab[153]
-#define __pyx_n_u_sys __pyx_string_tab[154]
-#define __pyx_n_u_test __pyx_string_tab[155]
-#define __pyx_n_u_throw __pyx_string_tab[156]
-#define __pyx_n_u_token __pyx_string_tab[157]
-#define __pyx_n_u_typing __pyx_string_tab[158]
-#define __pyx_n_u_unscramble __pyx_string_tab[159]
-#define __pyx_n_u_unscramble_locals_genexpr __pyx_string_tab[160]
-#define __pyx_n_u_uuid __pyx_string_tab[161]
-#define __pyx_n_u_value __pyx_string_tab[162]
-#define __pyx_n_u_values __pyx_string_tab[163]
-#define __pyx_n_u_warning __pyx_string_tab[164]
-#define __pyx_n_u_win32 __pyx_string_tab[165]
-#define __pyx_n_u_write_bytes __pyx_string_tab[166]
-#define __pyx_kp_b_iso88591_5XQ_84q_1_aq_c_U_q_S_q_q_4waq_A __pyx_string_tab[167]
-#define __pyx_kp_b_iso88591_81_XQa_t81A __pyx_string_tab[168]
-#define __pyx_kp_b_iso88591_A_1_1G6_1Cz_D_Q_1 __pyx_string_tab[169]
-#define __pyx_kp_b_iso88591_A_1_D_ay __pyx_string_tab[170]
-#define __pyx_kp_b_iso88591_XQ_4xxq_WCwa __pyx_string_tab[171]
-#define __pyx_kp_b_iso88591__8 __pyx_string_tab[172]
-#define __pyx_kp_b_iso88591_a __pyx_string_tab[173]
-#define __pyx_kp_b_iso88591_q_3j_1_Z_AU_WA_6_q_Qb_a_Q_Z_AU __pyx_string_tab[174]
-#define __pyx_kp_b_iso88591_t881IWCwa __pyx_string_tab[175]
-#define __pyx_kp_b_iso88591_uE_F_AQ_2U_a __pyx_string_tab[176]
+#define __pyx_n_u_IOPlatformExpertDevice __pyx_string_tab[44]
+#define __pyx_n_u_IOPlatformUUID __pyx_string_tab[45]
+#define __pyx_n_u_InvalidToken __pyx_string_tab[46]
+#define __pyx_n_u_List __pyx_string_tab[47]
+#define __pyx_n_u_MultiFernet __pyx_string_tab[48]
+#define __pyx_n_u_None __pyx_string_tab[49]
+#define __pyx_n_u_Optional __pyx_string_tab[50]
+#define __pyx_n_u_Path __pyx_string_tab[51]
+#define __pyx_n_u_Pyx_PyDict_NextRef __pyx_string_tab[52]
+#define __pyx_n_u_SERVICE_NAME __pyx_string_tab[53]
+#define __pyx_n_u_Serial __pyx_string_tab[54]
+#define __pyx_n_u_all __pyx_string_tab[55]
+#define __pyx_n_u_annotate __pyx_string_tab[56]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[57]
+#define __pyx_n_u_b __pyx_string_tab[58]
+#define __pyx_n_u_b64decode __pyx_string_tab[59]
+#define __pyx_n_u_base64 __pyx_string_tab[60]
+#define __pyx_n_u_build __pyx_string_tab[61]
+#define __pyx_n_u_check_output __pyx_string_tab[62]
+#define __pyx_n_u_chmod __pyx_string_tab[63]
+#define __pyx_n_u_ciphertext __pyx_string_tab[64]
+#define __pyx_n_u_class_getitem __pyx_string_tab[65]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[66]
+#define __pyx_n_u_close __pyx_string_tab[67]
+#define __pyx_n_u_cmd __pyx_string_tab[68]
+#define __pyx_n_u_cpuinfo __pyx_string_tab[69]
+#define __pyx_n_u_critical __pyx_string_tab[70]
+#define __pyx_n_u_cryptography_fernet __pyx_string_tab[71]
+#define __pyx_n_u_csproduct __pyx_string_tab[72]
+#define __pyx_n_u_darwin __pyx_string_tab[73]
+#define __pyx_n_u_decode __pyx_string_tab[74]
+#define __pyx_n_u_decoded_bytes __pyx_string_tab[75]
+#define __pyx_n_u_decrypt __pyx_string_tab[76]
+#define __pyx_n_u_doc __pyx_string_tab[77]
+#define __pyx_n_u_e __pyx_string_tab[78]
+#define __pyx_n_u_encode __pyx_string_tab[79]
+#define __pyx_n_u_encrypt __pyx_string_tab[80]
+#define __pyx_n_u_encryption_manager __pyx_string_tab[81]
+#define __pyx_n_u_enumerate __pyx_string_tab[82]
+#define __pyx_n_u_env_var __pyx_string_tab[83]
+#define __pyx_n_u_environ __pyx_string_tab[84]
+#define __pyx_n_u_error __pyx_string_tab[85]
+#define __pyx_n_u_exist_ok __pyx_string_tab[86]
+#define __pyx_n_u_exists __pyx_string_tab[87]
+#define __pyx_n_u_fallback_key_path __pyx_string_tab[88]
+#define __pyx_n_u_fernet __pyx_string_tab[89]
+#define __pyx_n_u_fernets __pyx_string_tab[90]
+#define __pyx_n_u_func __pyx_string_tab[91]
+#define __pyx_n_u_generate_key __pyx_string_tab[92]
+#define __pyx_n_u_genexpr __pyx_string_tab[93]
+#define __pyx_n_u_get __pyx_string_tab[94]
+#define __pyx_n_u_getLogger __pyx_string_tab[95]
+#define __pyx_n_u_get_password __pyx_string_tab[96]
+#define __pyx_n_u_get_robust_machine_id __pyx_string_tab[97]
+#define __pyx_n_u_getnode __pyx_string_tab[98]
+#define __pyx_n_u_i __pyx_string_tab[99]
+#define __pyx_n_u_info __pyx_string_tab[100]
+#define __pyx_n_u_init __pyx_string_tab[101]
+#define __pyx_n_u_int __pyx_string_tab[102]
+#define __pyx_n_u_ioreg __pyx_string_tab[103]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[104]
+#define __pyx_n_u_items __pyx_string_tab[105]
+#define __pyx_n_u_k __pyx_string_tab[106]
+#define __pyx_n_u_key __pyx_string_tab[107]
+#define __pyx_n_u_key_bytes __pyx_string_tab[108]
+#define __pyx_n_u_keyring __pyx_string_tab[109]
+#define __pyx_n_u_keys __pyx_string_tab[110]
+#define __pyx_n_u_line __pyx_string_tab[111]
+#define __pyx_n_u_load __pyx_string_tab[112]
+#define __pyx_n_u_logger __pyx_string_tab[113]
+#define __pyx_n_u_logging __pyx_string_tab[114]
+#define __pyx_n_u_machine_salt __pyx_string_tab[115]
+#define __pyx_n_u_main __pyx_string_tab[116]
+#define __pyx_n_u_metaclass __pyx_string_tab[117]
+#define __pyx_n_u_mkdir __pyx_string_tab[118]
+#define __pyx_n_u_module __pyx_string_tab[119]
+#define __pyx_n_u_name __pyx_string_tab[120]
+#define __pyx_n_u_name_2 __pyx_string_tab[121]
+#define __pyx_n_u_new_key_bytes __pyx_string_tab[122]
+#define __pyx_n_u_new_key_str __pyx_string_tab[123]
+#define __pyx_n_u_next __pyx_string_tab[124]
+#define __pyx_n_u_obfuscated_bytes __pyx_string_tab[125]
+#define __pyx_n_u_os __pyx_string_tab[126]
+#define __pyx_n_u_output __pyx_string_tab[127]
+#define __pyx_n_u_p __pyx_string_tab[128]
+#define __pyx_n_u_parent __pyx_string_tab[129]
+#define __pyx_n_u_parents __pyx_string_tab[130]
+#define __pyx_n_u_path __pyx_string_tab[131]
+#define __pyx_n_u_pathlib __pyx_string_tab[132]
+#define __pyx_n_u_plaintext __pyx_string_tab[133]
+#define __pyx_n_u_platform __pyx_string_tab[134]
+#define __pyx_n_u_pop __pyx_string_tab[135]
+#define __pyx_n_u_posix __pyx_string_tab[136]
+#define __pyx_n_u_prepare __pyx_string_tab[137]
+#define __pyx_n_u_prospero_ariel_encryption __pyx_string_tab[138]
+#define __pyx_n_u_qualname __pyx_string_tab[139]
+#define __pyx_n_u_raw_env __pyx_string_tab[140]
+#define __pyx_n_u_read_bytes __pyx_string_tab[141]
+#define __pyx_n_u_read_text __pyx_string_tab[142]
+#define __pyx_n_u_return __pyx_string_tab[143]
+#define __pyx_n_u_rotate_reencrypt __pyx_string_tab[144]
+#define __pyx_n_u_scrambled_b64 __pyx_string_tab[145]
+#define __pyx_n_u_self __pyx_string_tab[146]
+#define __pyx_n_u_send __pyx_string_tab[147]
+#define __pyx_n_u_set_name __pyx_string_tab[148]
+#define __pyx_n_u_set_password __pyx_string_tab[149]
+#define __pyx_n_u_setdefault __pyx_string_tab[150]
+#define __pyx_n_u_split __pyx_string_tab[151]
+#define __pyx_n_u_staticmethod __pyx_string_tab[152]
+#define __pyx_n_u_stored_key __pyx_string_tab[153]
+#define __pyx_n_u_str __pyx_string_tab[154]
+#define __pyx_n_u_strip __pyx_string_tab[155]
+#define __pyx_n_u_subprocess __pyx_string_tab[156]
+#define __pyx_n_u_sys __pyx_string_tab[157]
+#define __pyx_n_u_test __pyx_string_tab[158]
+#define __pyx_n_u_throw __pyx_string_tab[159]
+#define __pyx_n_u_token __pyx_string_tab[160]
+#define __pyx_n_u_typing __pyx_string_tab[161]
+#define __pyx_n_u_unscramble __pyx_string_tab[162]
+#define __pyx_n_u_unscramble_locals_genexpr __pyx_string_tab[163]
+#define __pyx_n_u_uuid __pyx_string_tab[164]
+#define __pyx_n_u_value __pyx_string_tab[165]
+#define __pyx_n_u_values __pyx_string_tab[166]
+#define __pyx_n_u_warning __pyx_string_tab[167]
+#define __pyx_n_u_win32 __pyx_string_tab[168]
+#define __pyx_n_u_wmic __pyx_string_tab[169]
+#define __pyx_n_u_write_bytes __pyx_string_tab[170]
+#define __pyx_kp_b_iso88591_5XQ_84q_1_aq_c_U_q_S_q_q_4waq_A __pyx_string_tab[171]
+#define __pyx_kp_b_iso88591_81_XQa_t81A __pyx_string_tab[172]
+#define __pyx_kp_b_iso88591_A_1_1G6_1Cz_D_Q_1 __pyx_string_tab[173]
+#define __pyx_kp_b_iso88591_A_1_D_ay __pyx_string_tab[174]
+#define __pyx_kp_b_iso88591_XQ_4xxq_WCwa __pyx_string_tab[175]
+#define __pyx_kp_b_iso88591__8 __pyx_string_tab[176]
+#define __pyx_kp_b_iso88591_a __pyx_string_tab[177]
+#define __pyx_kp_b_iso88591_q_3j_1_8_q_Z_AT_6_q_Qb_a_Q_9HF __pyx_string_tab[178]
+#define __pyx_kp_b_iso88591_t881IWCwa __pyx_string_tab[179]
+#define __pyx_kp_b_iso88591_uE_F_AQ_2U_a __pyx_string_tab[180]
 #define __pyx_int_0 __pyx_number_tab[0]
 #define __pyx_int_1 __pyx_number_tab[1]
 #define __pyx_int_90 __pyx_number_tab[2]
@@ -3053,7 +3057,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr);
   for (int i=0; i<3; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<11; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<177; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<181; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<4; ++i) { Py_CLEAR(clear_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_clear_contents ### */
 /* CommonTypesMetaclass.module_state_clear */
@@ -3092,7 +3096,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr);
   for (int i=0; i<3; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<11; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<177; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<181; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<4; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_traverse_contents ### */
 /* CommonTypesMetaclass.module_state_traverse */
@@ -3114,8 +3118,8 @@ return 0;
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
 
 /* Python wrapper */
@@ -3126,8 +3130,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_8prospero_5ariel_10encryption__unscramble, "Decodes scrambled string constants at runtime to hide them from static analysis.");
-static PyMethodDef __pyx_mdef_8prospero_5ariel_10encryption_1_unscramble = {"_unscramble", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_8prospero_5ariel_10encryption_1_unscramble, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_8prospero_5ariel_10encryption__unscramble};
+static PyMethodDef __pyx_mdef_8prospero_5ariel_10encryption_1_unscramble = {"_unscramble", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_8prospero_5ariel_10encryption_1_unscramble, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_8prospero_5ariel_10encryption_1_unscramble(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
@@ -3232,8 +3235,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 }
 static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "prospero/ariel/encryption.py":22
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
+/* "prospero/ariel/encryption.py":21
+ * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:
  *     decoded_bytes = base64.b64decode(scrambled_b64)
  *     return "".join(chr(b ^ key) for b in decoded_bytes)             # <<<<<<<<<<<<<<
  * 
@@ -3252,7 +3255,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_11_unscramble_genexpr(Py
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 22, __pyx_L1_error)
+    __PYX_ERR(0, 21, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -3263,7 +3266,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_11_unscramble_genexpr(Py
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_unscramble_locals_genexpr, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_unscramble_locals_genexpr, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -3300,18 +3303,18 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 22, __pyx_L1_error)
-  __pyx_r = PyList_New(0); if (unlikely(!__pyx_r)) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_r = PyList_New(0); if (unlikely(!__pyx_r)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_r);
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 22, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 21, __pyx_L1_error) }
   if (likely(PyList_CheckExact(__pyx_cur_scope->__pyx_genexpr_arg_0)) || PyTuple_CheckExact(__pyx_cur_scope->__pyx_genexpr_arg_0)) {
     __pyx_t_1 = __pyx_cur_scope->__pyx_genexpr_arg_0; __Pyx_INCREF(__pyx_t_1);
     __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_genexpr_arg_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_genexpr_arg_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_3 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
@@ -3319,7 +3322,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 22, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 21, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -3329,7 +3332,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_1);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 22, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 21, __pyx_L1_error)
           #endif
           if (__pyx_t_2 >= __pyx_temp) break;
         }
@@ -3340,13 +3343,13 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
         #endif
         ++__pyx_t_2;
       }
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
     } else {
       __pyx_t_4 = __pyx_t_3(__pyx_t_1);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 22, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 21, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -3357,14 +3360,14 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_b, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key)) { __Pyx_RaiseClosureNameError("key"); __PYX_ERR(0, 22, __pyx_L1_error) }
-    __pyx_t_4 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_key); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_key)) { __Pyx_RaiseClosureNameError("key"); __PYX_ERR(0, 21, __pyx_L1_error) }
+    __pyx_t_4 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_cur_scope->__pyx_outer_scope->__pyx_v_key); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_t_4); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyLong_As_int(__pyx_t_4); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyUnicode_FromOrdinal(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_4 = PyUnicode_FromOrdinal(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_r, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_r, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3395,8 +3398,8 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_11_unscramble_2generator
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
 
 static PyObject *__pyx_pf_8prospero_5ariel_10encryption__unscramble(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_scrambled_b64, PyObject *__pyx_v_key) {
@@ -3426,17 +3429,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption__unscramble(CYTHON_UNUSE
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_key);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_key);
 
-  /* "prospero/ariel/encryption.py":21
+  /* "prospero/ariel/encryption.py":20
+ * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)             # <<<<<<<<<<<<<<
  *     return "".join(chr(b ^ key) for b in decoded_bytes)
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_base64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_base64); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_b64decode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_b64decode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = 1;
@@ -3456,26 +3459,26 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption__unscramble(CYTHON_UNUSE
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_decoded_bytes = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "prospero/ariel/encryption.py":22
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
+  /* "prospero/ariel/encryption.py":21
+ * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:
  *     decoded_bytes = base64.b64decode(scrambled_b64)
  *     return "".join(chr(b ^ key) for b in decoded_bytes)             # <<<<<<<<<<<<<<
  * 
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_pf_8prospero_5ariel_10encryption_11_unscramble_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_decoded_bytes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_1 = __pyx_pf_8prospero_5ariel_10encryption_11_unscramble_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_decoded_bytes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_Generator_GetInlinedResult(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Generator_GetInlinedResult(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyUnicode_Join(__pyx_mstate_global->__pyx_kp_u_, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_Join(__pyx_mstate_global->__pyx_kp_u_, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_r = ((PyObject*)__pyx_t_1);
@@ -3486,8 +3489,8 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption__unscramble(CYTHON_UNUSE
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
 
   /* function exit code */
@@ -3507,18 +3510,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption__unscramble(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":30
+/* "prospero/ariel/encryption.py":28
  * 
  * 
  * def get_robust_machine_id() -> str:             # <<<<<<<<<<<<<<
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:
+ *         if sys.platform == "win32":
 */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_8prospero_5ariel_10encryption_3get_robust_machine_id(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-PyDoc_STRVAR(__pyx_doc_8prospero_5ariel_10encryption_2get_robust_machine_id, "Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware.");
-static PyMethodDef __pyx_mdef_8prospero_5ariel_10encryption_3get_robust_machine_id = {"get_robust_machine_id", (PyCFunction)__pyx_pw_8prospero_5ariel_10encryption_3get_robust_machine_id, METH_NOARGS, __pyx_doc_8prospero_5ariel_10encryption_2get_robust_machine_id};
+static PyMethodDef __pyx_mdef_8prospero_5ariel_10encryption_3get_robust_machine_id = {"get_robust_machine_id", (PyCFunction)__pyx_pw_8prospero_5ariel_10encryption_3get_robust_machine_id, METH_NOARGS, 0};
 static PyObject *__pyx_pw_8prospero_5ariel_10encryption_3get_robust_machine_id(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused) {
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
   PyObject *__pyx_r = 0;
@@ -3535,9 +3537,9 @@ static PyObject *__pyx_pw_8prospero_5ariel_10encryption_3get_robust_machine_id(P
 static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(CYTHON_UNUSED PyObject *__pyx_self) {
   PyObject *__pyx_v_cmd = NULL;
   PyObject *__pyx_v_output = NULL;
+  PyObject *__pyx_v_line = NULL;
   PyObject *__pyx_v_path = NULL;
   PyObject *__pyx_v_p = NULL;
-  PyObject *__pyx_v_line = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3552,20 +3554,20 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
   PyObject *__pyx_t_10 = NULL;
   size_t __pyx_t_11;
   Py_ssize_t __pyx_t_12;
-  Py_ssize_t __pyx_t_13;
-  PyObject *(*__pyx_t_14)(PyObject *);
+  PyObject *(*__pyx_t_13)(PyObject *);
+  Py_ssize_t __pyx_t_14;
   int __pyx_t_15;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_robust_machine_id", 0);
 
-  /* "prospero/ariel/encryption.py":32
+  /* "prospero/ariel/encryption.py":29
+ * 
  * def get_robust_machine_id() -> str:
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:             # <<<<<<<<<<<<<<
  *         if sys.platform == "win32":
- *             cmd = "wmic csproduct get uuid"
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
 */
   {
     __Pyx_PyThreadState_declare
@@ -3576,43 +3578,57 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "prospero/ariel/encryption.py":33
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
+      /* "prospero/ariel/encryption.py":30
+ * def get_robust_machine_id() -> str:
  *     try:
  *         if sys.platform == "win32":             # <<<<<<<<<<<<<<
- *             cmd = "wmic csproduct get uuid"
- *             output = subprocess.check_output(cmd, shell=True).decode()
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
+ *             output = subprocess.check_output(cmd).decode()
 */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 33, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 30, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 33, __pyx_L3_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_win32, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 33, __pyx_L3_error)
+      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_win32, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 30, __pyx_L3_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       if (__pyx_t_6) {
 
-        /* "prospero/ariel/encryption.py":34
+        /* "prospero/ariel/encryption.py":31
  *     try:
  *         if sys.platform == "win32":
- *             cmd = "wmic csproduct get uuid"             # <<<<<<<<<<<<<<
- *             output = subprocess.check_output(cmd, shell=True).decode()
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]             # <<<<<<<<<<<<<<
+ *             output = subprocess.check_output(cmd).decode()
  *             return output.split("\n")[1].strip()
 */
-        __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_u_wmic_csproduct_get_uuid);
-        __pyx_v_cmd = __pyx_mstate_global->__pyx_kp_u_wmic_csproduct_get_uuid;
+        __pyx_t_5 = PyList_New(4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_wmic);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_wmic);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 0, __pyx_mstate_global->__pyx_n_u_wmic) != (0)) __PYX_ERR(0, 31, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_csproduct);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_csproduct);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 1, __pyx_mstate_global->__pyx_n_u_csproduct) != (0)) __PYX_ERR(0, 31, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_get);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_get);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 2, __pyx_mstate_global->__pyx_n_u_get) != (0)) __PYX_ERR(0, 31, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_uuid);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_uuid);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 3, __pyx_mstate_global->__pyx_n_u_uuid) != (0)) __PYX_ERR(0, 31, __pyx_L3_error);
+        __pyx_v_cmd = ((PyObject*)__pyx_t_5);
+        __pyx_t_5 = 0;
 
-        /* "prospero/ariel/encryption.py":35
+        /* "prospero/ariel/encryption.py":32
  *         if sys.platform == "win32":
- *             cmd = "wmic csproduct get uuid"
- *             output = subprocess.check_output(cmd, shell=True).decode()             # <<<<<<<<<<<<<<
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
+ *             output = subprocess.check_output(cmd).decode()             # <<<<<<<<<<<<<<
  *             return output.split("\n")[1].strip()
  *         elif sys.platform == "darwin":
 */
         __pyx_t_8 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_subprocess); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L3_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_subprocess); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 32, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_check_output); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 35, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_check_output); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 32, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_t_11 = 1;
@@ -3628,15 +3644,11 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
         }
         #endif
         {
-          PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_8, __pyx_v_cmd};
-          __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L3_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_shell, Py_True, __pyx_t_9, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 35, __pyx_L3_error)
-          __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_10, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
+          PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_cmd};
+          __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_10, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 35, __pyx_L3_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 32, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_7);
         }
         __pyx_t_4 = __pyx_t_7;
@@ -3647,18 +3659,18 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
           __pyx_t_5 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_decode, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 35, __pyx_L3_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_5);
         }
         __pyx_v_output = __pyx_t_5;
         __pyx_t_5 = 0;
 
-        /* "prospero/ariel/encryption.py":36
- *             cmd = "wmic csproduct get uuid"
- *             output = subprocess.check_output(cmd, shell=True).decode()
+        /* "prospero/ariel/encryption.py":33
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
+ *             output = subprocess.check_output(cmd).decode()
  *             return output.split("\n")[1].strip()             # <<<<<<<<<<<<<<
  *         elif sys.platform == "darwin":
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
 */
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_10 = __pyx_v_output;
@@ -3668,10 +3680,10 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
           PyObject *__pyx_callargs[2] = {__pyx_t_10, __pyx_mstate_global->__pyx_kp_u__2};
           __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 36, __pyx_L3_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 33, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
-        __pyx_t_10 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 36, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyLong_From_long, 0, 0, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 33, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_7 = __pyx_t_10;
@@ -3682,84 +3694,94 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
           __pyx_t_5 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 36, __pyx_L3_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 33, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_5);
         }
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_5))) __PYX_ERR(0, 36, __pyx_L3_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_5))) __PYX_ERR(0, 33, __pyx_L3_error)
         __pyx_r = ((PyObject*)__pyx_t_5);
         __pyx_t_5 = 0;
         goto __pyx_L7_try_return;
 
-        /* "prospero/ariel/encryption.py":33
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
+        /* "prospero/ariel/encryption.py":30
+ * def get_robust_machine_id() -> str:
  *     try:
  *         if sys.platform == "win32":             # <<<<<<<<<<<<<<
- *             cmd = "wmic csproduct get uuid"
- *             output = subprocess.check_output(cmd, shell=True).decode()
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
+ *             output = subprocess.check_output(cmd).decode()
 */
       }
 
-      /* "prospero/ariel/encryption.py":37
- *             output = subprocess.check_output(cmd, shell=True).decode()
+      /* "prospero/ariel/encryption.py":34
+ *             output = subprocess.check_output(cmd).decode()
  *             return output.split("\n")[1].strip()
  *         elif sys.platform == "darwin":             # <<<<<<<<<<<<<<
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
- *             output = subprocess.check_output(cmd, shell=True).decode()
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+ *             output = subprocess.check_output(cmd).decode()
 */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 37, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 34, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 37, __pyx_L3_error)
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_platform); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 34, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_darwin, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 37, __pyx_L3_error)
+      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_10, __pyx_mstate_global->__pyx_n_u_darwin, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 34, __pyx_L3_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       if (__pyx_t_6) {
 
-        /* "prospero/ariel/encryption.py":38
+        /* "prospero/ariel/encryption.py":35
  *             return output.split("\n")[1].strip()
  *         elif sys.platform == "darwin":
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"             # <<<<<<<<<<<<<<
- *             output = subprocess.check_output(cmd, shell=True).decode()
- *             return output.split('"')[-2].strip()
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]             # <<<<<<<<<<<<<<
+ *             output = subprocess.check_output(cmd).decode()
+ *             for line in output.split("\n"):
 */
-        __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_u_ioreg_rd1_c_IOPlatformExpertDevi);
-        __pyx_v_cmd = __pyx_mstate_global->__pyx_kp_u_ioreg_rd1_c_IOPlatformExpertDevi;
+        __pyx_t_10 = PyList_New(4); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 35, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_ioreg);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_ioreg);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_10, 0, __pyx_mstate_global->__pyx_n_u_ioreg) != (0)) __PYX_ERR(0, 35, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_u_rd1);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_kp_u_rd1);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_10, 1, __pyx_mstate_global->__pyx_kp_u_rd1) != (0)) __PYX_ERR(0, 35, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_u_c);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_kp_u_c);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_10, 2, __pyx_mstate_global->__pyx_kp_u_c) != (0)) __PYX_ERR(0, 35, __pyx_L3_error);
+        __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_IOPlatformExpertDevice);
+        __Pyx_GIVEREF(__pyx_mstate_global->__pyx_n_u_IOPlatformExpertDevice);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_10, 3, __pyx_mstate_global->__pyx_n_u_IOPlatformExpertDevice) != (0)) __PYX_ERR(0, 35, __pyx_L3_error);
+        __pyx_v_cmd = ((PyObject*)__pyx_t_10);
+        __pyx_t_10 = 0;
 
-        /* "prospero/ariel/encryption.py":39
+        /* "prospero/ariel/encryption.py":36
  *         elif sys.platform == "darwin":
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
- *             output = subprocess.check_output(cmd, shell=True).decode()             # <<<<<<<<<<<<<<
- *             return output.split('"')[-2].strip()
- *         else:
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+ *             output = subprocess.check_output(cmd).decode()             # <<<<<<<<<<<<<<
+ *             for line in output.split("\n"):
+ *                 if "IOPlatformUUID" in line:
 */
         __pyx_t_4 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_subprocess); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 39, __pyx_L3_error)
-        __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_check_output); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 39, __pyx_L3_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_subprocess); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 36, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_check_output); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 36, __pyx_L3_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __pyx_t_11 = 1;
         #if CYTHON_UNPACK_METHODS
-        if (unlikely(PyMethod_Check(__pyx_t_8))) {
-          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_8);
+        if (unlikely(PyMethod_Check(__pyx_t_9))) {
+          __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_9);
           assert(__pyx_t_4);
-          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_8);
+          PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_9);
           __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(__pyx__function);
-          __Pyx_DECREF_SET(__pyx_t_8, __pyx__function);
+          __Pyx_DECREF_SET(__pyx_t_9, __pyx__function);
           __pyx_t_11 = 0;
         }
         #endif
         {
-          PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_4, __pyx_v_cmd};
-          __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 39, __pyx_L3_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_shell, Py_True, __pyx_t_9, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 39, __pyx_L3_error)
-          __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_8, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
+          PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_cmd};
+          __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 39, __pyx_L3_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 36, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_7);
         }
         __pyx_t_5 = __pyx_t_7;
@@ -3770,115 +3792,216 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
           __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_decode, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 39, __pyx_L3_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 36, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
         __pyx_v_output = __pyx_t_10;
         __pyx_t_10 = 0;
 
-        /* "prospero/ariel/encryption.py":40
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
- *             output = subprocess.check_output(cmd, shell=True).decode()
- *             return output.split('"')[-2].strip()             # <<<<<<<<<<<<<<
- *         else:
- *             # Linux / Raspberry Pi: Check product UUID, fallback to Pi CPU Serial or machine-id[cite: 1]
+        /* "prospero/ariel/encryption.py":37
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+ *             output = subprocess.check_output(cmd).decode()
+ *             for line in output.split("\n"):             # <<<<<<<<<<<<<<
+ *                 if "IOPlatformUUID" in line:
+ *                     return line.split('"')[-2].strip()
 */
-        __Pyx_XDECREF(__pyx_r);
-        __pyx_t_8 = __pyx_v_output;
-        __Pyx_INCREF(__pyx_t_8);
-        __pyx_t_11 = 0;
-        {
-          PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_mstate_global->__pyx_kp_u__3};
-          __pyx_t_5 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 40, __pyx_L3_error)
-          __Pyx_GOTREF(__pyx_t_5);
-        }
-        __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_5, -2L, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 40, __pyx_L3_error)
-        __Pyx_GOTREF(__pyx_t_8);
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_7 = __pyx_t_8;
+        __pyx_t_7 = __pyx_v_output;
         __Pyx_INCREF(__pyx_t_7);
         __pyx_t_11 = 0;
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
-          __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          PyObject *__pyx_callargs[2] = {__pyx_t_7, __pyx_mstate_global->__pyx_kp_u__2};
+          __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 40, __pyx_L3_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 37, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_10))||((__pyx_t_10) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_10))) __PYX_ERR(0, 40, __pyx_L3_error)
-        __pyx_r = ((PyObject*)__pyx_t_10);
-        __pyx_t_10 = 0;
-        goto __pyx_L7_try_return;
+        if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
+          __pyx_t_7 = __pyx_t_10; __Pyx_INCREF(__pyx_t_7);
+          __pyx_t_12 = 0;
+          __pyx_t_13 = NULL;
+        } else {
+          __pyx_t_12 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 37, __pyx_L3_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 37, __pyx_L3_error)
+        }
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        for (;;) {
+          if (likely(!__pyx_t_13)) {
+            if (likely(PyList_CheckExact(__pyx_t_7))) {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_7);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 37, __pyx_L3_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              __pyx_t_10 = __Pyx_PyList_GetItemRefFast(__pyx_t_7, __pyx_t_12, __Pyx_ReferenceSharing_OwnStrongReference);
+              ++__pyx_t_12;
+            } else {
+              {
+                Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_7);
+                #if !CYTHON_ASSUME_SAFE_SIZE
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 37, __pyx_L3_error)
+                #endif
+                if (__pyx_t_12 >= __pyx_temp) break;
+              }
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_10 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_12));
+              #else
+              __pyx_t_10 = __Pyx_PySequence_ITEM(__pyx_t_7, __pyx_t_12);
+              #endif
+              ++__pyx_t_12;
+            }
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 37, __pyx_L3_error)
+          } else {
+            __pyx_t_10 = __pyx_t_13(__pyx_t_7);
+            if (unlikely(!__pyx_t_10)) {
+              PyObject* exc_type = PyErr_Occurred();
+              if (exc_type) {
+                if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 37, __pyx_L3_error)
+                PyErr_Clear();
+              }
+              break;
+            }
+          }
+          __Pyx_GOTREF(__pyx_t_10);
+          __Pyx_XDECREF_SET(__pyx_v_line, __pyx_t_10);
+          __pyx_t_10 = 0;
 
-        /* "prospero/ariel/encryption.py":37
- *             output = subprocess.check_output(cmd, shell=True).decode()
+          /* "prospero/ariel/encryption.py":38
+ *             output = subprocess.check_output(cmd).decode()
+ *             for line in output.split("\n"):
+ *                 if "IOPlatformUUID" in line:             # <<<<<<<<<<<<<<
+ *                     return line.split('"')[-2].strip()
+ *         else:
+*/
+          __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_IOPlatformUUID, __pyx_v_line, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 38, __pyx_L3_error)
+          if (__pyx_t_6) {
+
+            /* "prospero/ariel/encryption.py":39
+ *             for line in output.split("\n"):
+ *                 if "IOPlatformUUID" in line:
+ *                     return line.split('"')[-2].strip()             # <<<<<<<<<<<<<<
+ *         else:
+ *             for path in [
+*/
+            __Pyx_XDECREF(__pyx_r);
+            __pyx_t_4 = __pyx_v_line;
+            __Pyx_INCREF(__pyx_t_4);
+            __pyx_t_11 = 0;
+            {
+              PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u__3};
+              __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+              __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+              if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 39, __pyx_L3_error)
+              __Pyx_GOTREF(__pyx_t_9);
+            }
+            __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_9, -2L, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 39, __pyx_L3_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+            __pyx_t_5 = __pyx_t_4;
+            __Pyx_INCREF(__pyx_t_5);
+            __pyx_t_11 = 0;
+            {
+              PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
+              __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+              __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+              __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 39, __pyx_L3_error)
+              __Pyx_GOTREF(__pyx_t_10);
+            }
+            if (!(likely(PyUnicode_CheckExact(__pyx_t_10))||((__pyx_t_10) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_10))) __PYX_ERR(0, 39, __pyx_L3_error)
+            __pyx_r = ((PyObject*)__pyx_t_10);
+            __pyx_t_10 = 0;
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            goto __pyx_L7_try_return;
+
+            /* "prospero/ariel/encryption.py":38
+ *             output = subprocess.check_output(cmd).decode()
+ *             for line in output.split("\n"):
+ *                 if "IOPlatformUUID" in line:             # <<<<<<<<<<<<<<
+ *                     return line.split('"')[-2].strip()
+ *         else:
+*/
+          }
+
+          /* "prospero/ariel/encryption.py":37
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+ *             output = subprocess.check_output(cmd).decode()
+ *             for line in output.split("\n"):             # <<<<<<<<<<<<<<
+ *                 if "IOPlatformUUID" in line:
+ *                     return line.split('"')[-2].strip()
+*/
+        }
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+        /* "prospero/ariel/encryption.py":34
+ *             output = subprocess.check_output(cmd).decode()
  *             return output.split("\n")[1].strip()
  *         elif sys.platform == "darwin":             # <<<<<<<<<<<<<<
- *             cmd = "ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID"
- *             output = subprocess.check_output(cmd, shell=True).decode()
+ *             cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+ *             output = subprocess.check_output(cmd).decode()
 */
+        goto __pyx_L9;
       }
 
-      /* "prospero/ariel/encryption.py":43
+      /* "prospero/ariel/encryption.py":41
+ *                     return line.split('"')[-2].strip()
  *         else:
- *             # Linux / Raspberry Pi: Check product UUID, fallback to Pi CPU Serial or machine-id[cite: 1]
  *             for path in [             # <<<<<<<<<<<<<<
  *                 "/sys/class/dmi/id/product_uuid",
  *                 "/etc/machine-id",
 */
       /*else*/ {
-        __pyx_t_10 = __pyx_mstate_global->__pyx_tuple[0]; __Pyx_INCREF(__pyx_t_10);
+        __pyx_t_7 = __pyx_mstate_global->__pyx_tuple[0]; __Pyx_INCREF(__pyx_t_7);
         __pyx_t_12 = 0;
         for (;;) {
           if (__pyx_t_12 >= 3) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_8 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_10, __pyx_t_12));
+          __pyx_t_10 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_12));
           #else
-          __pyx_t_8 = __Pyx_PySequence_ITEM(__pyx_t_10, __pyx_t_12);
+          __pyx_t_10 = __Pyx_PySequence_ITEM(__pyx_t_7, __pyx_t_12);
           #endif
           ++__pyx_t_12;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 43, __pyx_L3_error)
-          __Pyx_GOTREF(__pyx_t_8);
-          __Pyx_XDECREF_SET(__pyx_v_path, ((PyObject*)__pyx_t_8));
-          __pyx_t_8 = 0;
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 41, __pyx_L3_error)
+          __Pyx_GOTREF(__pyx_t_10);
+          __Pyx_XDECREF_SET(__pyx_v_path, ((PyObject*)__pyx_t_10));
+          __pyx_t_10 = 0;
 
-          /* "prospero/ariel/encryption.py":48
+          /* "prospero/ariel/encryption.py":46
  *                 "/proc/cpuinfo",
  *             ]:
  *                 p = Path(path)             # <<<<<<<<<<<<<<
  *                 if p.exists():
  *                     if "cpuinfo" in path:
 */
-          __pyx_t_7 = NULL;
-          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_Path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L3_error)
+          __pyx_t_4 = NULL;
+          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_Path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_11 = 1;
           #if CYTHON_UNPACK_METHODS
           if (unlikely(PyMethod_Check(__pyx_t_5))) {
-            __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
-            assert(__pyx_t_7);
+            __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+            assert(__pyx_t_4);
             PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
-            __Pyx_INCREF(__pyx_t_7);
+            __Pyx_INCREF(__pyx_t_4);
             __Pyx_INCREF(__pyx__function);
             __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
             __pyx_t_11 = 0;
           }
           #endif
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_7, __pyx_v_path};
-            __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+            PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_path};
+            __pyx_t_10 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 48, __pyx_L3_error)
-            __Pyx_GOTREF(__pyx_t_8);
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 46, __pyx_L3_error)
+            __Pyx_GOTREF(__pyx_t_10);
           }
-          __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_8);
-          __pyx_t_8 = 0;
+          __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_10);
+          __pyx_t_10 = 0;
 
-          /* "prospero/ariel/encryption.py":49
+          /* "prospero/ariel/encryption.py":47
  *             ]:
  *                 p = Path(path)
  *                 if p.exists():             # <<<<<<<<<<<<<<
@@ -3890,16 +4013,16 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
           __pyx_t_11 = 0;
           {
             PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-            __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_exists, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+            __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_exists, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 49, __pyx_L3_error)
-            __Pyx_GOTREF(__pyx_t_8);
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 47, __pyx_L3_error)
+            __Pyx_GOTREF(__pyx_t_10);
           }
-          __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 49, __pyx_L3_error)
-          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+          __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 47, __pyx_L3_error)
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           if (__pyx_t_6) {
 
-            /* "prospero/ariel/encryption.py":50
+            /* "prospero/ariel/encryption.py":48
  *                 p = Path(path)
  *                 if p.exists():
  *                     if "cpuinfo" in path:             # <<<<<<<<<<<<<<
@@ -3908,12 +4031,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
 */
             if (unlikely(__pyx_v_path == Py_None)) {
               PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-              __PYX_ERR(0, 50, __pyx_L3_error)
+              __PYX_ERR(0, 48, __pyx_L3_error)
             }
-            __pyx_t_6 = (__Pyx_PyUnicode_ContainsTF(__pyx_mstate_global->__pyx_n_u_cpuinfo, __pyx_v_path, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 50, __pyx_L3_error)
+            __pyx_t_6 = (__Pyx_PyUnicode_ContainsTF(__pyx_mstate_global->__pyx_n_u_cpuinfo, __pyx_v_path, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 48, __pyx_L3_error)
             if (__pyx_t_6) {
 
-              /* "prospero/ariel/encryption.py":51
+              /* "prospero/ariel/encryption.py":49
  *                 if p.exists():
  *                     if "cpuinfo" in path:
  *                         for line in p.read_text().split("\n"):             # <<<<<<<<<<<<<<
@@ -3925,86 +4048,86 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
               __pyx_t_11 = 0;
               {
                 PyObject *__pyx_callargs[2] = {__pyx_t_9, NULL};
-                __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read_text, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read_text, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                 __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-                if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 51, __pyx_L3_error)
-                __Pyx_GOTREF(__pyx_t_7);
+                if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 49, __pyx_L3_error)
+                __Pyx_GOTREF(__pyx_t_4);
               }
-              __pyx_t_5 = __pyx_t_7;
+              __pyx_t_5 = __pyx_t_4;
               __Pyx_INCREF(__pyx_t_5);
               __pyx_t_11 = 0;
               {
                 PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_kp_u__2};
-                __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                 __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 51, __pyx_L3_error)
-                __Pyx_GOTREF(__pyx_t_8);
+                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+                if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 49, __pyx_L3_error)
+                __Pyx_GOTREF(__pyx_t_10);
               }
-              if (likely(PyList_CheckExact(__pyx_t_8)) || PyTuple_CheckExact(__pyx_t_8)) {
-                __pyx_t_7 = __pyx_t_8; __Pyx_INCREF(__pyx_t_7);
-                __pyx_t_13 = 0;
-                __pyx_t_14 = NULL;
+              if (likely(PyList_CheckExact(__pyx_t_10)) || PyTuple_CheckExact(__pyx_t_10)) {
+                __pyx_t_4 = __pyx_t_10; __Pyx_INCREF(__pyx_t_4);
+                __pyx_t_14 = 0;
+                __pyx_t_13 = NULL;
               } else {
-                __pyx_t_13 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 51, __pyx_L3_error)
-                __Pyx_GOTREF(__pyx_t_7);
-                __pyx_t_14 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 51, __pyx_L3_error)
+                __pyx_t_14 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 49, __pyx_L3_error)
+                __Pyx_GOTREF(__pyx_t_4);
+                __pyx_t_13 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 49, __pyx_L3_error)
               }
-              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+              __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
               for (;;) {
-                if (likely(!__pyx_t_14)) {
-                  if (likely(PyList_CheckExact(__pyx_t_7))) {
+                if (likely(!__pyx_t_13)) {
+                  if (likely(PyList_CheckExact(__pyx_t_4))) {
                     {
-                      Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_7);
+                      Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 51, __pyx_L3_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 49, __pyx_L3_error)
                       #endif
-                      if (__pyx_t_13 >= __pyx_temp) break;
+                      if (__pyx_t_14 >= __pyx_temp) break;
                     }
-                    __pyx_t_8 = __Pyx_PyList_GetItemRefFast(__pyx_t_7, __pyx_t_13, __Pyx_ReferenceSharing_OwnStrongReference);
-                    ++__pyx_t_13;
+                    __pyx_t_10 = __Pyx_PyList_GetItemRefFast(__pyx_t_4, __pyx_t_14, __Pyx_ReferenceSharing_OwnStrongReference);
+                    ++__pyx_t_14;
                   } else {
                     {
-                      Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_7);
+                      Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
                       #if !CYTHON_ASSUME_SAFE_SIZE
-                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 51, __pyx_L3_error)
+                      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 49, __pyx_L3_error)
                       #endif
-                      if (__pyx_t_13 >= __pyx_temp) break;
+                      if (__pyx_t_14 >= __pyx_temp) break;
                     }
                     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                    __pyx_t_8 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_13));
+                    __pyx_t_10 = __Pyx_NewRef(PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_14));
                     #else
-                    __pyx_t_8 = __Pyx_PySequence_ITEM(__pyx_t_7, __pyx_t_13);
+                    __pyx_t_10 = __Pyx_PySequence_ITEM(__pyx_t_4, __pyx_t_14);
                     #endif
-                    ++__pyx_t_13;
+                    ++__pyx_t_14;
                   }
-                  if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 51, __pyx_L3_error)
+                  if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 49, __pyx_L3_error)
                 } else {
-                  __pyx_t_8 = __pyx_t_14(__pyx_t_7);
-                  if (unlikely(!__pyx_t_8)) {
+                  __pyx_t_10 = __pyx_t_13(__pyx_t_4);
+                  if (unlikely(!__pyx_t_10)) {
                     PyObject* exc_type = PyErr_Occurred();
                     if (exc_type) {
-                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 51, __pyx_L3_error)
+                      if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 49, __pyx_L3_error)
                       PyErr_Clear();
                     }
                     break;
                   }
                 }
-                __Pyx_GOTREF(__pyx_t_8);
-                __Pyx_XDECREF_SET(__pyx_v_line, __pyx_t_8);
-                __pyx_t_8 = 0;
+                __Pyx_GOTREF(__pyx_t_10);
+                __Pyx_XDECREF_SET(__pyx_v_line, __pyx_t_10);
+                __pyx_t_10 = 0;
 
-                /* "prospero/ariel/encryption.py":52
+                /* "prospero/ariel/encryption.py":50
  *                     if "cpuinfo" in path:
  *                         for line in p.read_text().split("\n"):
  *                             if "Serial" in line:             # <<<<<<<<<<<<<<
  *                                 return line.split(":")[-1].strip()
  *                     else:
 */
-                __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_Serial, __pyx_v_line, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 52, __pyx_L3_error)
+                __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_mstate_global->__pyx_n_u_Serial, __pyx_v_line, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 50, __pyx_L3_error)
                 if (__pyx_t_6) {
 
-                  /* "prospero/ariel/encryption.py":53
+                  /* "prospero/ariel/encryption.py":51
  *                         for line in p.read_text().split("\n"):
  *                             if "Serial" in line:
  *                                 return line.split(":")[-1].strip()             # <<<<<<<<<<<<<<
@@ -4012,38 +4135,38 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
  *                         return p.read_text().strip()
 */
                   __Pyx_XDECREF(__pyx_r);
-                  __pyx_t_4 = __pyx_v_line;
-                  __Pyx_INCREF(__pyx_t_4);
+                  __pyx_t_8 = __pyx_v_line;
+                  __Pyx_INCREF(__pyx_t_8);
                   __pyx_t_11 = 0;
                   {
-                    PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u__4};
+                    PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_mstate_global->__pyx_kp_u__4};
                     __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_split, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-                    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-                    if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L3_error)
+                    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+                    if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 51, __pyx_L3_error)
                     __Pyx_GOTREF(__pyx_t_9);
                   }
-                  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_9, -1L, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 53, __pyx_L3_error)
-                  __Pyx_GOTREF(__pyx_t_4);
+                  __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_9, -1L, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 51, __pyx_L3_error)
+                  __Pyx_GOTREF(__pyx_t_8);
                   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-                  __pyx_t_5 = __pyx_t_4;
+                  __pyx_t_5 = __pyx_t_8;
                   __Pyx_INCREF(__pyx_t_5);
                   __pyx_t_11 = 0;
                   {
                     PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-                    __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                    __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-                    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 53, __pyx_L3_error)
-                    __Pyx_GOTREF(__pyx_t_8);
+                    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 51, __pyx_L3_error)
+                    __Pyx_GOTREF(__pyx_t_10);
                   }
-                  if (!(likely(PyUnicode_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_8))) __PYX_ERR(0, 53, __pyx_L3_error)
-                  __pyx_r = ((PyObject*)__pyx_t_8);
-                  __pyx_t_8 = 0;
+                  if (!(likely(PyUnicode_CheckExact(__pyx_t_10))||((__pyx_t_10) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_10))) __PYX_ERR(0, 51, __pyx_L3_error)
+                  __pyx_r = ((PyObject*)__pyx_t_10);
+                  __pyx_t_10 = 0;
+                  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
                   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-                  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
                   goto __pyx_L7_try_return;
 
-                  /* "prospero/ariel/encryption.py":52
+                  /* "prospero/ariel/encryption.py":50
  *                     if "cpuinfo" in path:
  *                         for line in p.read_text().split("\n"):
  *                             if "Serial" in line:             # <<<<<<<<<<<<<<
@@ -4052,7 +4175,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
 */
                 }
 
-                /* "prospero/ariel/encryption.py":51
+                /* "prospero/ariel/encryption.py":49
  *                 if p.exists():
  *                     if "cpuinfo" in path:
  *                         for line in p.read_text().split("\n"):             # <<<<<<<<<<<<<<
@@ -4060,19 +4183,19 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
  *                                 return line.split(":")[-1].strip()
 */
               }
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "prospero/ariel/encryption.py":50
+              /* "prospero/ariel/encryption.py":48
  *                 p = Path(path)
  *                 if p.exists():
  *                     if "cpuinfo" in path:             # <<<<<<<<<<<<<<
  *                         for line in p.read_text().split("\n"):
  *                             if "Serial" in line:
 */
-              goto __pyx_L13;
+              goto __pyx_L17;
             }
 
-            /* "prospero/ariel/encryption.py":55
+            /* "prospero/ariel/encryption.py":53
  *                                 return line.split(":")[-1].strip()
  *                     else:
  *                         return p.read_text().strip()             # <<<<<<<<<<<<<<
@@ -4086,31 +4209,31 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
               __pyx_t_11 = 0;
               {
                 PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-                __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read_text, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read_text, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
                 __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-                if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 55, __pyx_L3_error)
-                __Pyx_GOTREF(__pyx_t_4);
+                if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 53, __pyx_L3_error)
+                __Pyx_GOTREF(__pyx_t_8);
               }
-              __pyx_t_8 = __pyx_t_4;
-              __Pyx_INCREF(__pyx_t_8);
+              __pyx_t_10 = __pyx_t_8;
+              __Pyx_INCREF(__pyx_t_10);
               __pyx_t_11 = 0;
               {
-                PyObject *__pyx_callargs[2] = {__pyx_t_8, NULL};
-                __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-                __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-                if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 55, __pyx_L3_error)
-                __Pyx_GOTREF(__pyx_t_7);
+                PyObject *__pyx_callargs[2] = {__pyx_t_10, NULL};
+                __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+                __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+                __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+                if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 53, __pyx_L3_error)
+                __Pyx_GOTREF(__pyx_t_4);
               }
-              if (!(likely(PyUnicode_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_7))) __PYX_ERR(0, 55, __pyx_L3_error)
-              __pyx_r = ((PyObject*)__pyx_t_7);
-              __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+              if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 53, __pyx_L3_error)
+              __pyx_r = ((PyObject*)__pyx_t_4);
+              __pyx_t_4 = 0;
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
               goto __pyx_L7_try_return;
             }
-            __pyx_L13:;
+            __pyx_L17:;
 
-            /* "prospero/ariel/encryption.py":49
+            /* "prospero/ariel/encryption.py":47
  *             ]:
  *                 p = Path(path)
  *                 if p.exists():             # <<<<<<<<<<<<<<
@@ -4119,23 +4242,24 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
 */
           }
 
-          /* "prospero/ariel/encryption.py":43
+          /* "prospero/ariel/encryption.py":41
+ *                     return line.split('"')[-2].strip()
  *         else:
- *             # Linux / Raspberry Pi: Check product UUID, fallback to Pi CPU Serial or machine-id[cite: 1]
  *             for path in [             # <<<<<<<<<<<<<<
  *                 "/sys/class/dmi/id/product_uuid",
  *                 "/etc/machine-id",
 */
         }
-        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       }
+      __pyx_L9:;
 
-      /* "prospero/ariel/encryption.py":32
+      /* "prospero/ariel/encryption.py":29
+ * 
  * def get_robust_machine_id() -> str:
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:             # <<<<<<<<<<<<<<
  *         if sys.platform == "win32":
- *             cmd = "wmic csproduct get uuid"
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
 */
     }
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4150,7 +4274,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "prospero/ariel/encryption.py":56
+    /* "prospero/ariel/encryption.py":54
  *                     else:
  *                         return p.read_text().strip()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -4164,12 +4288,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
     }
     goto __pyx_L5_except_error;
 
-    /* "prospero/ariel/encryption.py":32
+    /* "prospero/ariel/encryption.py":29
+ * 
  * def get_robust_machine_id() -> str:
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:             # <<<<<<<<<<<<<<
  *         if sys.platform == "win32":
- *             cmd = "wmic csproduct get uuid"
+ *             cmd = ["wmic", "csproduct", "get", "uuid"]
 */
     __pyx_L5_except_error:;
     __Pyx_XGIVEREF(__pyx_t_1);
@@ -4191,53 +4315,53 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
     __pyx_L8_try_end:;
   }
 
-  /* "prospero/ariel/encryption.py":60
+  /* "prospero/ariel/encryption.py":57
+ *         pass
  * 
- *     # Absolute fallback[cite: 1]
  *     return str(uuid.getnode())             # <<<<<<<<<<<<<<
  * 
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_7 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_uuid); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_getnode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_4 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_uuid); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_getnode); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_11 = 1;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_8))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_8);
-    assert(__pyx_t_7);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_8);
-    __Pyx_INCREF(__pyx_t_7);
+  if (unlikely(PyMethod_Check(__pyx_t_10))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_10);
+    assert(__pyx_t_4);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_10);
+    __Pyx_INCREF(__pyx_t_4);
     __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_8, __pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_10, __pyx__function);
     __pyx_t_11 = 0;
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
-    __pyx_t_10 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_8, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 60, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_10);
+    PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
+    __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_10, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 57, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
   }
-  __pyx_t_8 = __Pyx_PyObject_Unicode(__pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_r = ((PyObject*)__pyx_t_8);
-  __pyx_t_8 = 0;
+  __pyx_t_10 = __Pyx_PyObject_Unicode(__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_r = ((PyObject*)__pyx_t_10);
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "prospero/ariel/encryption.py":30
+  /* "prospero/ariel/encryption.py":28
  * 
  * 
  * def get_robust_machine_id() -> str:             # <<<<<<<<<<<<<<
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:
+ *         if sys.platform == "win32":
 */
 
   /* function exit code */
@@ -4253,15 +4377,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_2get_robust_machine_id(C
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_cmd);
   __Pyx_XDECREF(__pyx_v_output);
+  __Pyx_XDECREF(__pyx_v_line);
   __Pyx_XDECREF(__pyx_v_path);
   __Pyx_XDECREF(__pyx_v_p);
-  __Pyx_XDECREF(__pyx_v_line);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":64
+/* "prospero/ariel/encryption.py":61
  * 
  * class EncryptionManager:
  *     def __init__(             # <<<<<<<<<<<<<<
@@ -4310,44 +4434,44 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_self,&__pyx_mstate_global->__pyx_n_u_env_var,&__pyx_mstate_global->__pyx_n_u_fallback_key_path,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 64, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 61, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 61, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 61, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 61, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 64, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 61, __pyx_L3_error)
       if (!values[1]) values[1] = __Pyx_NewRef(((PyObject*)((PyObject*)__pyx_mstate_global->__pyx_n_u_ARIEL_ENCRYPTION_KEY)));
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject*)((PyObject*)__pyx_mstate_global->__pyx_kp_u_static_ariel_key_fallback)));
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 3, i); __PYX_ERR(0, 64, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 3, i); __PYX_ERR(0, 61, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 61, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 61, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 61, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
@@ -4360,7 +4484,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 64, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 3, __pyx_nargs); __PYX_ERR(0, 61, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4371,8 +4495,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_env_var), (&PyUnicode_Type), 0, "env_var", 2))) __PYX_ERR(0, 66, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fallback_key_path), (&PyUnicode_Type), 0, "fallback_key_path", 2))) __PYX_ERR(0, 67, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_env_var), (&PyUnicode_Type), 0, "env_var", 2))) __PYX_ERR(0, 63, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fallback_key_path), (&PyUnicode_Type), 0, "fallback_key_path", 2))) __PYX_ERR(0, 64, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager___init__(__pyx_self, __pyx_v_self, __pyx_v_env_var, __pyx_v_fallback_key_path);
 
   /* function exit code */
@@ -4403,7 +4527,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager___in
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "prospero/ariel/encryption.py":69
+  /* "prospero/ariel/encryption.py":66
  *         fallback_key_path: str = "static/.ariel.key-fallback",
  *     ) -> None:
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)             # <<<<<<<<<<<<<<
@@ -4417,13 +4541,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager___in
     PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_v_env_var, __pyx_v_fallback_key_path};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_load, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet, __pyx_t_1) < (0)) __PYX_ERR(0, 69, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet, __pyx_t_1) < (0)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "prospero/ariel/encryption.py":64
+  /* "prospero/ariel/encryption.py":61
  * 
  * class EncryptionManager:
  *     def __init__(             # <<<<<<<<<<<<<<
@@ -4445,12 +4569,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager___in
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":71
+/* "prospero/ariel/encryption.py":68
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)
  * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:             # <<<<<<<<<<<<<<
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)
+ *         if raw_env:
 */
 
 /* Python wrapper */
@@ -4494,38 +4618,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_self,&__pyx_mstate_global->__pyx_n_u_env_var,&__pyx_mstate_global->__pyx_n_u_fallback_key_path,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 71, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 68, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 68, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 68, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 68, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_load", 0) < (0)) __PYX_ERR(0, 71, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_load", 0) < (0)) __PYX_ERR(0, 68, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_load", 1, 3, 3, i); __PYX_ERR(0, 71, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_load", 1, 3, 3, i); __PYX_ERR(0, 68, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 71, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 68, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 71, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 68, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 71, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 68, __pyx_L3_error)
     }
     __pyx_v_self = values[0];
     __pyx_v_env_var = ((PyObject*)values[1]);
@@ -4533,7 +4657,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_load", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 71, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_load", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 68, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4544,8 +4668,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_env_var), (&PyUnicode_Type), 0, "env_var", 2))) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fallback_key_path), (&PyUnicode_Type), 0, "fallback_key_path", 2))) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_env_var), (&PyUnicode_Type), 0, "env_var", 2))) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_fallback_key_path), (&PyUnicode_Type), 0, "fallback_key_path", 2))) __PYX_ERR(0, 68, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_load(__pyx_self, __pyx_v_self, __pyx_v_env_var, __pyx_v_fallback_key_path);
 
   /* function exit code */
@@ -4566,8 +4690,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 }
 static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_2generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "prospero/ariel/encryption.py":100
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+/* "prospero/ariel/encryption.py":93
+ *                 obfuscated_bytes: bytes = path.read_bytes()
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                     for i, b in enumerate(obfuscated_bytes)
@@ -4586,7 +4710,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 100, __pyx_L1_error)
+    __PYX_ERR(0, 93, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -4597,7 +4721,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_2generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load_locals_g, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_2generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load_locals_g, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -4642,26 +4766,26 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 100, __pyx_L1_error)
+    __PYX_ERR(0, 93, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
   __pyx_t_1 = __pyx_mstate_global->__pyx_int_0;
 
-  /* "prospero/ariel/encryption.py":101
+  /* "prospero/ariel/encryption.py":94
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]
  *                     for i, b in enumerate(obfuscated_bytes)             # <<<<<<<<<<<<<<
  *                 )
  *                 logger.warning("Loaded fallback machine-bound key file.")
 */
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 101, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 94, __pyx_L1_error) }
   if (unlikely(__pyx_cur_scope->__pyx_genexpr_arg_0 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' is not iterable");
-    __PYX_ERR(0, 101, __pyx_L1_error)
+    __PYX_ERR(0, 94, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __pyx_t_2 = __pyx_cur_scope->__pyx_genexpr_arg_0;
-  __pyx_t_3 = __Pyx_PyBytes_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBytes_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 94, __pyx_L1_error)
   __pyx_t_4 = 1;
   __pyx_t_5 = -1L;
   while (1) {
@@ -4669,8 +4793,8 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __pyx_t_5 = (__pyx_t_5 + 1);
     __pyx_t_6 = (__pyx_t_5 < __pyx_t_3);
     if (__pyx_t_6) {
-      __pyx_t_7 = __Pyx_GetItemInt_Bytes(__pyx_t_2, __pyx_t_5, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 101, __pyx_L1_error)
-      __pyx_t_8 = __Pyx_PyLong_From_int(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 101, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt_Bytes(__pyx_t_2, __pyx_t_5, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 94, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyLong_From_int(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 94, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_b);
       __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_b, __pyx_t_8);
@@ -4684,8 +4808,8 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     }
     __pyx_L6:;
 
-    /* "prospero/ariel/encryption.py":100
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+    /* "prospero/ariel/encryption.py":93
+ *                 obfuscated_bytes: bytes = path.read_bytes()
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                     for i, b in enumerate(obfuscated_bytes)
@@ -4696,45 +4820,45 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_i, __pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_1);
 
-    /* "prospero/ariel/encryption.py":101
+    /* "prospero/ariel/encryption.py":94
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]
  *                     for i, b in enumerate(obfuscated_bytes)             # <<<<<<<<<<<<<<
  *                 )
  *                 logger.warning("Loaded fallback machine-bound key file.")
 */
-    __pyx_t_8 = __Pyx_PyLong_AddObjC(__pyx_t_1, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 101, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyLong_AddObjC(__pyx_t_1, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1);
     __pyx_t_1 = __pyx_t_8;
     __pyx_t_8 = 0;
 
-    /* "prospero/ariel/encryption.py":100
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+    /* "prospero/ariel/encryption.py":93
+ *                 obfuscated_bytes: bytes = path.read_bytes()
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                     for i, b in enumerate(obfuscated_bytes)
  *                 )
 */
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 100, __pyx_L1_error) }
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 100, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 93, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 93, __pyx_L1_error) }
     __pyx_t_8 = __pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt;
     __Pyx_INCREF(__pyx_t_8);
     if (unlikely(__pyx_t_8 == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 100, __pyx_L1_error)
+      __PYX_ERR(0, 93, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyBytes_GET_SIZE(__pyx_t_8); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyBytes_GET_SIZE(__pyx_t_8); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyLong_FromSsize_t(__pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_8 = PyLong_FromSsize_t(__pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_10 = PyNumber_Remainder(__pyx_cur_scope->__pyx_v_i, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_10 = PyNumber_Remainder(__pyx_cur_scope->__pyx_v_i, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt, __pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt, __pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_10 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 100, __pyx_L1_error)
+    __pyx_t_10 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_r = __pyx_t_10;
@@ -4762,7 +4886,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
     __pyx_t_4 = __pyx_cur_scope->__pyx_t_3;
     __pyx_t_5 = __pyx_cur_scope->__pyx_t_4;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 100, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 93, __pyx_L1_error)
     __pyx_L4_continue:;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4793,7 +4917,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
 }
 static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_5generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "prospero/ariel/encryption.py":123
+/* "prospero/ariel/encryption.py":113
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
@@ -4813,7 +4937,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 123, __pyx_L1_error)
+    __PYX_ERR(0, 113, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -4824,7 +4948,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_5generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load_locals_g, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_load_5generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_genexpr, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load_locals_g, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption); if (unlikely(!gen)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -4869,26 +4993,26 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started generator");
-    __PYX_ERR(0, 123, __pyx_L1_error)
+    __PYX_ERR(0, 113, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_mstate_global->__pyx_int_0);
   __pyx_t_1 = __pyx_mstate_global->__pyx_int_0;
 
-  /* "prospero/ariel/encryption.py":124
+  /* "prospero/ariel/encryption.py":114
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]
  *                 for i, b in enumerate(new_key_bytes)             # <<<<<<<<<<<<<<
  *             )
  *             path.write_bytes(obfuscated_bytes)
 */
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 124, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 114, __pyx_L1_error) }
   if (unlikely(__pyx_cur_scope->__pyx_genexpr_arg_0 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' is not iterable");
-    __PYX_ERR(0, 124, __pyx_L1_error)
+    __PYX_ERR(0, 114, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __pyx_t_2 = __pyx_cur_scope->__pyx_genexpr_arg_0;
-  __pyx_t_3 = __Pyx_PyBytes_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBytes_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 114, __pyx_L1_error)
   __pyx_t_4 = 1;
   __pyx_t_5 = -1L;
   while (1) {
@@ -4896,8 +5020,8 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __pyx_t_5 = (__pyx_t_5 + 1);
     __pyx_t_6 = (__pyx_t_5 < __pyx_t_3);
     if (__pyx_t_6) {
-      __pyx_t_7 = __Pyx_GetItemInt_Bytes(__pyx_t_2, __pyx_t_5, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __pyx_t_8 = __Pyx_PyLong_From_int(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt_Bytes(__pyx_t_2, __pyx_t_5, Py_ssize_t, 1, PyLong_FromSsize_t, 0, 0, 0, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyLong_From_int(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 114, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_b);
       __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_b, __pyx_t_8);
@@ -4911,7 +5035,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     }
     __pyx_L6:;
 
-    /* "prospero/ariel/encryption.py":123
+    /* "prospero/ariel/encryption.py":113
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
@@ -4923,45 +5047,45 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_i, __pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_1);
 
-    /* "prospero/ariel/encryption.py":124
+    /* "prospero/ariel/encryption.py":114
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]
  *                 for i, b in enumerate(new_key_bytes)             # <<<<<<<<<<<<<<
  *             )
  *             path.write_bytes(obfuscated_bytes)
 */
-    __pyx_t_8 = __Pyx_PyLong_AddObjC(__pyx_t_1, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyLong_AddObjC(__pyx_t_1, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1);
     __pyx_t_1 = __pyx_t_8;
     __pyx_t_8 = 0;
 
-    /* "prospero/ariel/encryption.py":123
+    /* "prospero/ariel/encryption.py":113
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                 for i, b in enumerate(new_key_bytes)
  *             )
 */
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 123, __pyx_L1_error) }
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 123, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 113, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt)) { __Pyx_RaiseClosureNameError("machine_salt"); __PYX_ERR(0, 113, __pyx_L1_error) }
     __pyx_t_8 = __pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt;
     __Pyx_INCREF(__pyx_t_8);
     if (unlikely(__pyx_t_8 == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 123, __pyx_L1_error)
+      __PYX_ERR(0, 113, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyBytes_GET_SIZE(__pyx_t_8); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyBytes_GET_SIZE(__pyx_t_8); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyLong_FromSsize_t(__pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_8 = PyLong_FromSsize_t(__pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_10 = PyNumber_Remainder(__pyx_cur_scope->__pyx_v_i, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_10 = PyNumber_Remainder(__pyx_cur_scope->__pyx_v_i, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt, __pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_machine_salt, __pyx_t_10); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_10 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_10 = PyNumber_Xor(__pyx_cur_scope->__pyx_v_b, __pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_r = __pyx_t_10;
@@ -4989,7 +5113,7 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
     __pyx_t_4 = __pyx_cur_scope->__pyx_t_3;
     __pyx_t_5 = __pyx_cur_scope->__pyx_t_4;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 123, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 113, __pyx_L1_error)
     __pyx_L4_continue:;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5019,12 +5143,12 @@ static PyObject *__pyx_gb_8prospero_5ariel_10encryption_17EncryptionManager_5_lo
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":71
+/* "prospero/ariel/encryption.py":68
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)
  * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:             # <<<<<<<<<<<<<<
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)
+ *         if raw_env:
 */
 
 static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_load(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_env_var, PyObject *__pyx_v_fallback_key_path) {
@@ -5076,21 +5200,21 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_8prospero_5ariel_10encryption___pyx_scope_struct_2__load *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 71, __pyx_L1_error)
+    __PYX_ERR(0, 68, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
 
-  /* "prospero/ariel/encryption.py":73
+  /* "prospero/ariel/encryption.py":69
+ * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)             # <<<<<<<<<<<<<<
  *         if raw_env:
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_environ); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_environ); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = __pyx_t_4;
@@ -5101,15 +5225,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 69, __pyx_L1_error)
   __pyx_v_raw_env = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "prospero/ariel/encryption.py":74
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
+  /* "prospero/ariel/encryption.py":70
+ *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:
  *         raw_env: Optional[str] = os.environ.get(env_var)
  *         if raw_env:             # <<<<<<<<<<<<<<
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]
@@ -5119,13 +5243,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyUnicode_IS_TRUE(__pyx_v_raw_env);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 74, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 70, __pyx_L1_error)
     __pyx_t_6 = (__pyx_temp != 0);
   }
 
   if (__pyx_t_6) {
 
-    /* "prospero/ariel/encryption.py":75
+    /* "prospero/ariel/encryption.py":71
  *         raw_env: Optional[str] = os.environ.get(env_var)
  *         if raw_env:
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]             # <<<<<<<<<<<<<<
@@ -5133,13 +5257,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *             return self._build(keys)
 */
     { /* enter inner scope */
-      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L6_error)
+      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 71, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (unlikely(__pyx_v_raw_env == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "split");
-        __PYX_ERR(0, 75, __pyx_L6_error)
+        __PYX_ERR(0, 71, __pyx_L6_error)
       }
-      __pyx_t_4 = PyUnicode_Split(__pyx_v_raw_env, __pyx_mstate_global->__pyx_kp_u__5, -1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L6_error)
+      __pyx_t_4 = PyUnicode_Split(__pyx_v_raw_env, __pyx_mstate_global->__pyx_kp_u__5, -1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_2 = __pyx_t_4; __Pyx_INCREF(__pyx_t_2);
       __pyx_t_7 = 0;
@@ -5148,13 +5272,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 75, __pyx_L6_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 71, __pyx_L6_error)
           #endif
           if (__pyx_t_7 >= __pyx_temp) break;
         }
         __pyx_t_4 = __Pyx_PyList_GetItemRefFast(__pyx_t_2, __pyx_t_7, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_7;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L6_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_k, __pyx_t_4);
         __pyx_t_4 = 0;
@@ -5165,10 +5289,10 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
           __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L6_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
-        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 75, __pyx_L6_error)
+        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 71, __pyx_L6_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         if (__pyx_t_6) {
           __pyx_t_3 = __pyx_8genexpr1__pyx_v_k;
@@ -5178,10 +5302,10 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
             PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
             __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L6_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L6_error)
             __Pyx_GOTREF(__pyx_t_4);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 75, __pyx_L6_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 71, __pyx_L6_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         }
       }
@@ -5196,7 +5320,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_v_keys = ((PyObject*)__pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "prospero/ariel/encryption.py":76
+    /* "prospero/ariel/encryption.py":72
  *         if raw_env:
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]
  *             logger.info("Ariel encryption keys loaded from environment variable.")             # <<<<<<<<<<<<<<
@@ -5204,9 +5328,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  * 
 */
     __pyx_t_2 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 76, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 72, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 72, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = 1;
@@ -5226,17 +5350,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "prospero/ariel/encryption.py":77
+    /* "prospero/ariel/encryption.py":73
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]
  *             logger.info("Ariel encryption keys loaded from environment variable.")
  *             return self._build(keys)             # <<<<<<<<<<<<<<
  * 
- *         # 2. Prefer OS Secure Credential Store (Windows Credential Manager / Gnome Keyring)[cite: 1]
+ *         try:
 */
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_3 = __pyx_v_self;
@@ -5246,15 +5370,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_keys};
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_build, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "prospero/ariel/encryption.py":74
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
+    /* "prospero/ariel/encryption.py":70
+ *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:
  *         raw_env: Optional[str] = os.environ.get(env_var)
  *         if raw_env:             # <<<<<<<<<<<<<<
  *             keys: List[str] = [k.strip() for k in raw_env.split(",") if k.strip()]
@@ -5262,9 +5386,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
 */
   }
 
-  /* "prospero/ariel/encryption.py":80
+  /* "prospero/ariel/encryption.py":75
+ *             return self._build(keys)
  * 
- *         # 2. Prefer OS Secure Credential Store (Windows Credential Manager / Gnome Keyring)[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:
@@ -5278,22 +5402,22 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XGOTREF(__pyx_t_10);
     /*try:*/ {
 
-      /* "prospero/ariel/encryption.py":81
- *         # 2. Prefer OS Secure Credential Store (Windows Credential Manager / Gnome Keyring)[cite: 1]
+      /* "prospero/ariel/encryption.py":76
+ * 
  *         try:
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)             # <<<<<<<<<<<<<<
  *             if stored_key:
  *                 logger.info(
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_keyring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L12_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_keyring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_get_password); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L12_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_get_password); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 76, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L12_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 81, __pyx_L12_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 76, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_t_5 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -5314,14 +5438,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L12_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
-      if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 81, __pyx_L12_error)
+      if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 76, __pyx_L12_error)
       __pyx_v_stored_key = ((PyObject*)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "prospero/ariel/encryption.py":82
+      /* "prospero/ariel/encryption.py":77
  *         try:
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:             # <<<<<<<<<<<<<<
@@ -5332,13 +5456,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       else
       {
         Py_ssize_t __pyx_temp = __Pyx_PyUnicode_IS_TRUE(__pyx_v_stored_key);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 82, __pyx_L12_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 77, __pyx_L12_error)
         __pyx_t_6 = (__pyx_temp != 0);
       }
 
       if (__pyx_t_6) {
 
-        /* "prospero/ariel/encryption.py":83
+        /* "prospero/ariel/encryption.py":78
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:
  *                 logger.info(             # <<<<<<<<<<<<<<
@@ -5346,9 +5470,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *                 )
 */
         __pyx_t_4 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 83, __pyx_L12_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 78, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 83, __pyx_L12_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_t_5 = 1;
@@ -5368,12 +5492,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L12_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L12_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "prospero/ariel/encryption.py":86
+        /* "prospero/ariel/encryption.py":81
  *                     "Encryption key successfully retrieved from OS secure storage."
  *                 )
  *                 return self._build([stored_key])             # <<<<<<<<<<<<<<
@@ -5383,25 +5507,25 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_2 = __pyx_v_self;
         __Pyx_INCREF(__pyx_t_2);
-        __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L12_error)
+        __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L12_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_v_stored_key);
         __Pyx_GIVEREF(__pyx_v_stored_key);
-        if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_stored_key) != (0)) __PYX_ERR(0, 86, __pyx_L12_error);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_stored_key) != (0)) __PYX_ERR(0, 81, __pyx_L12_error);
         __pyx_t_5 = 0;
         {
           PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_4};
           __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_build, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L12_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L12_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __pyx_r = __pyx_t_1;
         __pyx_t_1 = 0;
         goto __pyx_L16_try_return;
 
-        /* "prospero/ariel/encryption.py":82
+        /* "prospero/ariel/encryption.py":77
  *         try:
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:             # <<<<<<<<<<<<<<
@@ -5410,9 +5534,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
 */
       }
 
-      /* "prospero/ariel/encryption.py":80
+      /* "prospero/ariel/encryption.py":75
+ *             return self._build(keys)
  * 
- *         # 2. Prefer OS Secure Credential Store (Windows Credential Manager / Gnome Keyring)[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:
@@ -5429,7 +5553,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "prospero/ariel/encryption.py":87
+    /* "prospero/ariel/encryption.py":82
  *                 )
  *                 return self._build([stored_key])
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -5439,7 +5563,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_12) {
       __Pyx_AddTraceback("prospero.ariel.encryption.EncryptionManager._load", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 87, __pyx_L14_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 82, __pyx_L14_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -5447,7 +5571,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __pyx_v_e = __pyx_t_4;
       /*try:*/ {
 
-        /* "prospero/ariel/encryption.py":88
+        /* "prospero/ariel/encryption.py":83
  *                 return self._build([stored_key])
  *         except Exception as e:
  *             logger.warning("OS Secure Keyring unavailable, falling back: %s", e)             # <<<<<<<<<<<<<<
@@ -5455,9 +5579,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  * 
 */
         __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 88, __pyx_L24_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 83, __pyx_L24_error)
         __Pyx_GOTREF(__pyx_t_13);
-        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 88, __pyx_L24_error)
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 83, __pyx_L24_error)
         __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __pyx_t_5 = 1;
@@ -5477,23 +5601,23 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_11 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_14, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 88, __pyx_L24_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 83, __pyx_L24_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "prospero/ariel/encryption.py":89
+        /* "prospero/ariel/encryption.py":84
  *         except Exception as e:
  *             logger.warning("OS Secure Keyring unavailable, falling back: %s", e)
  *             stored_key = None             # <<<<<<<<<<<<<<
  * 
- *         # 3. Fallback: Obfuscated Machine-Bound Local File[cite: 1]
+ *         path: Path = Path(fallback_key_path)
 */
         __Pyx_INCREF(Py_None);
         __Pyx_XDECREF_SET(__pyx_v_stored_key, ((PyObject*)Py_None));
       }
 
-      /* "prospero/ariel/encryption.py":87
+      /* "prospero/ariel/encryption.py":82
  *                 )
  *                 return self._build([stored_key])
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -5547,9 +5671,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     }
     goto __pyx_L14_except_error;
 
-    /* "prospero/ariel/encryption.py":80
+    /* "prospero/ariel/encryption.py":75
+ *             return self._build(keys)
  * 
- *         # 2. Prefer OS Secure Credential Store (Windows Credential Manager / Gnome Keyring)[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             stored_key: Optional[str] = keyring.get_password(SERVICE_NAME, ACCOUNT_NAME)
  *             if stored_key:
@@ -5574,15 +5698,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_L17_try_end:;
   }
 
-  /* "prospero/ariel/encryption.py":92
+  /* "prospero/ariel/encryption.py":86
+ *             stored_key = None
  * 
- *         # 3. Fallback: Obfuscated Machine-Bound Local File[cite: 1]
  *         path: Path = Path(fallback_key_path)             # <<<<<<<<<<<<<<
  *         machine_salt: bytes = get_robust_machine_id().encode()
  * 
 */
   __pyx_t_4 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_Path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_Path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -5601,21 +5725,21 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_1, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 92, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_path = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "prospero/ariel/encryption.py":93
- *         # 3. Fallback: Obfuscated Machine-Bound Local File[cite: 1]
+  /* "prospero/ariel/encryption.py":87
+ * 
  *         path: Path = Path(fallback_key_path)
  *         machine_salt: bytes = get_robust_machine_id().encode()             # <<<<<<<<<<<<<<
  * 
  *         if path.exists():
 */
   __pyx_t_11 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -5634,7 +5758,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_14, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_1 = __pyx_t_4;
@@ -5645,15 +5769,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 93, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_2))) __PYX_ERR(0, 93, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_2))) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_cur_scope->__pyx_v_machine_salt = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "prospero/ariel/encryption.py":95
+  /* "prospero/ariel/encryption.py":89
  *         machine_salt: bytes = get_robust_machine_id().encode()
  * 
  *         if path.exists():             # <<<<<<<<<<<<<<
@@ -5667,19 +5791,19 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_exists, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 89, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_6) {
 
-    /* "prospero/ariel/encryption.py":96
+    /* "prospero/ariel/encryption.py":90
  * 
  *         if path.exists():
  *             try:             # <<<<<<<<<<<<<<
  *                 obfuscated_bytes: bytes = path.read_bytes()
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+ *                 key_bytes: bytes = bytes(
 */
     {
       __Pyx_PyThreadState_declare
@@ -5690,12 +5814,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __Pyx_XGOTREF(__pyx_t_8);
       /*try:*/ {
 
-        /* "prospero/ariel/encryption.py":97
+        /* "prospero/ariel/encryption.py":91
  *         if path.exists():
  *             try:
  *                 obfuscated_bytes: bytes = path.read_bytes()             # <<<<<<<<<<<<<<
- *                 # XOR de-obfuscation tied to the hardware fingerprint
  *                 key_bytes: bytes = bytes(
+ *                     b ^ machine_salt[i % len(machine_salt)]
 */
         __pyx_t_4 = __pyx_v_path;
         __Pyx_INCREF(__pyx_t_4);
@@ -5704,30 +5828,30 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
           __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read_bytes, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L31_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L31_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
-        if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_2))) __PYX_ERR(0, 97, __pyx_L31_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_2))) __PYX_ERR(0, 91, __pyx_L31_error)
         __pyx_v_obfuscated_bytes = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "prospero/ariel/encryption.py":99
+        /* "prospero/ariel/encryption.py":92
+ *             try:
  *                 obfuscated_bytes: bytes = path.read_bytes()
- *                 # XOR de-obfuscation tied to the hardware fingerprint
  *                 key_bytes: bytes = bytes(             # <<<<<<<<<<<<<<
  *                     b ^ machine_salt[i % len(machine_salt)]
  *                     for i, b in enumerate(obfuscated_bytes)
 */
         __pyx_t_4 = NULL;
 
-        /* "prospero/ariel/encryption.py":100
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+        /* "prospero/ariel/encryption.py":93
+ *                 obfuscated_bytes: bytes = path.read_bytes()
  *                 key_bytes: bytes = bytes(
  *                     b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                     for i, b in enumerate(obfuscated_bytes)
  *                 )
 */
-        __pyx_t_1 = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_load_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_obfuscated_bytes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L31_error)
+        __pyx_t_1 = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_load_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_obfuscated_bytes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L31_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_t_5 = 1;
         {
@@ -5735,13 +5859,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)(&PyBytes_Type), __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L31_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 92, __pyx_L31_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_v_key_bytes = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "prospero/ariel/encryption.py":103
+        /* "prospero/ariel/encryption.py":96
  *                     for i, b in enumerate(obfuscated_bytes)
  *                 )
  *                 logger.warning("Loaded fallback machine-bound key file.")             # <<<<<<<<<<<<<<
@@ -5749,9 +5873,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *             except Exception as e:
 */
         __pyx_t_1 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 103, __pyx_L31_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 96, __pyx_L31_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 103, __pyx_L31_error)
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 96, __pyx_L31_error)
         __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_5 = 1;
@@ -5771,12 +5895,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_14, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L31_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L31_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "prospero/ariel/encryption.py":104
+        /* "prospero/ariel/encryption.py":97
  *                 )
  *                 logger.warning("Loaded fallback machine-bound key file.")
  *                 return self._build([key_bytes.decode().strip()])             # <<<<<<<<<<<<<<
@@ -5786,7 +5910,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_14 = __pyx_v_self;
         __Pyx_INCREF(__pyx_t_14);
-        __pyx_t_11 = __Pyx_decode_bytes(__pyx_v_key_bytes, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L31_error)
+        __pyx_t_11 = __Pyx_decode_bytes(__pyx_v_key_bytes, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 97, __pyx_L31_error)
         __Pyx_GOTREF(__pyx_t_11);
         __pyx_t_4 = __pyx_t_11;
         __Pyx_INCREF(__pyx_t_4);
@@ -5796,13 +5920,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_strip, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L31_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L31_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
-        __pyx_t_11 = PyList_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 104, __pyx_L31_error)
+        __pyx_t_11 = PyList_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 97, __pyx_L31_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_GIVEREF(__pyx_t_1);
-        if (__Pyx_PyList_SET_ITEM(__pyx_t_11, 0, __pyx_t_1) != (0)) __PYX_ERR(0, 104, __pyx_L31_error);
+        if (__Pyx_PyList_SET_ITEM(__pyx_t_11, 0, __pyx_t_1) != (0)) __PYX_ERR(0, 97, __pyx_L31_error);
         __pyx_t_1 = 0;
         __pyx_t_5 = 0;
         {
@@ -5810,19 +5934,19 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_build, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 104, __pyx_L31_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L31_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
         __pyx_t_2 = 0;
         goto __pyx_L35_try_return;
 
-        /* "prospero/ariel/encryption.py":96
+        /* "prospero/ariel/encryption.py":90
  * 
  *         if path.exists():
  *             try:             # <<<<<<<<<<<<<<
  *                 obfuscated_bytes: bytes = path.read_bytes()
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+ *                 key_bytes: bytes = bytes(
 */
       }
       __pyx_L31_error:;
@@ -5834,7 +5958,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "prospero/ariel/encryption.py":105
+      /* "prospero/ariel/encryption.py":98
  *                 logger.warning("Loaded fallback machine-bound key file.")
  *                 return self._build([key_bytes.decode().strip()])
  *             except Exception as e:             # <<<<<<<<<<<<<<
@@ -5844,7 +5968,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __pyx_t_15 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
       if (__pyx_t_15) {
         __Pyx_AddTraceback("prospero.ariel.encryption.EncryptionManager._load", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_11, &__pyx_t_14) < 0) __PYX_ERR(0, 105, __pyx_L33_except_error)
+        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_11, &__pyx_t_14) < 0) __PYX_ERR(0, 98, __pyx_L33_except_error)
         __Pyx_XGOTREF(__pyx_t_2);
         __Pyx_XGOTREF(__pyx_t_11);
         __Pyx_XGOTREF(__pyx_t_14);
@@ -5852,17 +5976,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __pyx_v_e = __pyx_t_11;
         /*try:*/ {
 
-          /* "prospero/ariel/encryption.py":106
+          /* "prospero/ariel/encryption.py":99
  *                 return self._build([key_bytes.decode().strip()])
  *             except Exception as e:
  *                 logger.error("Failed to read fallback key file: %s", e)             # <<<<<<<<<<<<<<
  * 
- *         # 4. First Run Initialization: Generate key and distribute it[cite: 1]
+ *         new_key_bytes: bytes = Fernet.generate_key()
 */
           __pyx_t_4 = NULL;
-          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L42_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L42_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 106, __pyx_L42_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 99, __pyx_L42_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_5 = 1;
@@ -5882,13 +6006,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
             __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_13, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L42_error)
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L42_error)
             __Pyx_GOTREF(__pyx_t_1);
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         }
 
-        /* "prospero/ariel/encryption.py":105
+        /* "prospero/ariel/encryption.py":98
  *                 logger.warning("Loaded fallback machine-bound key file.")
  *                 return self._build([key_bytes.decode().strip()])
  *             except Exception as e:             # <<<<<<<<<<<<<<
@@ -5942,12 +6066,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       }
       goto __pyx_L33_except_error;
 
-      /* "prospero/ariel/encryption.py":96
+      /* "prospero/ariel/encryption.py":90
  * 
  *         if path.exists():
  *             try:             # <<<<<<<<<<<<<<
  *                 obfuscated_bytes: bytes = path.read_bytes()
- *                 # XOR de-obfuscation tied to the hardware fingerprint
+ *                 key_bytes: bytes = bytes(
 */
       __pyx_L33_except_error:;
       __Pyx_XGIVEREF(__pyx_t_10);
@@ -5968,7 +6092,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __Pyx_ExceptionReset(__pyx_t_10, __pyx_t_9, __pyx_t_8);
     }
 
-    /* "prospero/ariel/encryption.py":95
+    /* "prospero/ariel/encryption.py":89
  *         machine_salt: bytes = get_robust_machine_id().encode()
  * 
  *         if path.exists():             # <<<<<<<<<<<<<<
@@ -5977,17 +6101,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
 */
   }
 
-  /* "prospero/ariel/encryption.py":109
+  /* "prospero/ariel/encryption.py":101
+ *                 logger.error("Failed to read fallback key file: %s", e)
  * 
- *         # 4. First Run Initialization: Generate key and distribute it[cite: 1]
  *         new_key_bytes: bytes = Fernet.generate_key()             # <<<<<<<<<<<<<<
  *         new_key_str: str = new_key_bytes.decode()
  * 
 */
   __pyx_t_11 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_Fernet); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_Fernet); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_generate_key); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_generate_key); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_5 = 1;
@@ -6007,32 +6131,32 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_14 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_1, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 109, __pyx_L1_error)
+    if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 101, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
   }
-  if (!(likely(PyBytes_CheckExact(__pyx_t_14))||((__pyx_t_14) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_14))) __PYX_ERR(0, 109, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_14))||((__pyx_t_14) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_14))) __PYX_ERR(0, 101, __pyx_L1_error)
   __pyx_v_new_key_bytes = ((PyObject*)__pyx_t_14);
   __pyx_t_14 = 0;
 
-  /* "prospero/ariel/encryption.py":110
- *         # 4. First Run Initialization: Generate key and distribute it[cite: 1]
+  /* "prospero/ariel/encryption.py":102
+ * 
  *         new_key_bytes: bytes = Fernet.generate_key()
  *         new_key_str: str = new_key_bytes.decode()             # <<<<<<<<<<<<<<
  * 
- *         # Save to Secure Keyring[cite: 1]
+ *         try:
 */
   if (unlikely(__pyx_v_new_key_bytes == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-    __PYX_ERR(0, 110, __pyx_L1_error)
+    __PYX_ERR(0, 102, __pyx_L1_error)
   }
-  __pyx_t_14 = __Pyx_decode_bytes(__pyx_v_new_key_bytes, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_t_14 = __Pyx_decode_bytes(__pyx_v_new_key_bytes, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
   __pyx_v_new_key_str = ((PyObject*)__pyx_t_14);
   __pyx_t_14 = 0;
 
-  /* "prospero/ariel/encryption.py":113
+  /* "prospero/ariel/encryption.py":104
+ *         new_key_str: str = new_key_bytes.decode()
  * 
- *         # Save to Secure Keyring[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")
@@ -6046,22 +6170,22 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XGOTREF(__pyx_t_10);
     /*try:*/ {
 
-      /* "prospero/ariel/encryption.py":114
- *         # Save to Secure Keyring[cite: 1]
+      /* "prospero/ariel/encryption.py":105
+ * 
  *         try:
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)             # <<<<<<<<<<<<<<
  *             logger.info("Generated new key and saved to OS secure storage.")
  *         except Exception as e:
 */
       __pyx_t_1 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_keyring); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 114, __pyx_L48_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_keyring); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 105, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_set_password); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L48_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_set_password); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 114, __pyx_L48_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 105, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 114, __pyx_L48_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 105, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_13);
       __pyx_t_5 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -6082,12 +6206,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 114, __pyx_L48_error)
+        if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 105, __pyx_L48_error)
         __Pyx_GOTREF(__pyx_t_14);
       }
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
 
-      /* "prospero/ariel/encryption.py":115
+      /* "prospero/ariel/encryption.py":106
  *         try:
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")             # <<<<<<<<<<<<<<
@@ -6095,9 +6219,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *             logger.error("Could not write new key to OS Keyring: %s", e)
 */
       __pyx_t_2 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 115, __pyx_L48_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 106, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_13);
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 115, __pyx_L48_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_info); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 106, __pyx_L48_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __pyx_t_5 = 1;
@@ -6117,14 +6241,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __pyx_t_14 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_11, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 115, __pyx_L48_error)
+        if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 106, __pyx_L48_error)
         __Pyx_GOTREF(__pyx_t_14);
       }
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
 
-      /* "prospero/ariel/encryption.py":113
+      /* "prospero/ariel/encryption.py":104
+ *         new_key_str: str = new_key_bytes.decode()
  * 
- *         # Save to Secure Keyring[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")
@@ -6143,7 +6267,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "prospero/ariel/encryption.py":116
+    /* "prospero/ariel/encryption.py":107
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6153,7 +6277,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_12) {
       __Pyx_AddTraceback("prospero.ariel.encryption.EncryptionManager._load", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_14, &__pyx_t_11, &__pyx_t_2) < 0) __PYX_ERR(0, 116, __pyx_L50_except_error)
+      if (__Pyx_GetException(&__pyx_t_14, &__pyx_t_11, &__pyx_t_2) < 0) __PYX_ERR(0, 107, __pyx_L50_except_error)
       __Pyx_XGOTREF(__pyx_t_14);
       __Pyx_XGOTREF(__pyx_t_11);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -6161,17 +6285,17 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __pyx_v_e = __pyx_t_11;
       /*try:*/ {
 
-        /* "prospero/ariel/encryption.py":117
+        /* "prospero/ariel/encryption.py":108
  *             logger.info("Generated new key and saved to OS secure storage.")
  *         except Exception as e:
  *             logger.error("Could not write new key to OS Keyring: %s", e)             # <<<<<<<<<<<<<<
  * 
- *         # Write to local file fallback[cite: 1]
+ *         try:
 */
         __pyx_t_1 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L59_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 108, __pyx_L59_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 117, __pyx_L59_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 108, __pyx_L59_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_5 = 1;
@@ -6191,13 +6315,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_13 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 117, __pyx_L59_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 108, __pyx_L59_error)
           __Pyx_GOTREF(__pyx_t_13);
         }
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       }
 
-      /* "prospero/ariel/encryption.py":116
+      /* "prospero/ariel/encryption.py":107
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6251,9 +6375,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     }
     goto __pyx_L50_except_error;
 
-    /* "prospero/ariel/encryption.py":113
+    /* "prospero/ariel/encryption.py":104
+ *         new_key_str: str = new_key_bytes.decode()
  * 
- *         # Save to Secure Keyring[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             keyring.set_password(SERVICE_NAME, ACCOUNT_NAME, new_key_str)
  *             logger.info("Generated new key and saved to OS secure storage.")
@@ -6272,9 +6396,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_L53_try_end:;
   }
 
-  /* "prospero/ariel/encryption.py":120
+  /* "prospero/ariel/encryption.py":110
+ *             logger.error("Could not write new key to OS Keyring: %s", e)
  * 
- *         # Write to local file fallback[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
@@ -6288,34 +6412,34 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XGOTREF(__pyx_t_8);
     /*try:*/ {
 
-      /* "prospero/ariel/encryption.py":121
- *         # Write to local file fallback[cite: 1]
+      /* "prospero/ariel/encryption.py":111
+ * 
  *         try:
  *             path.parent.mkdir(parents=True, exist_ok=True)             # <<<<<<<<<<<<<<
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]
 */
-      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_path, __pyx_mstate_global->__pyx_n_u_parent); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 121, __pyx_L65_error)
+      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_path, __pyx_mstate_global->__pyx_n_u_parent); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 111, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_14);
       __pyx_t_11 = __pyx_t_14;
       __Pyx_INCREF(__pyx_t_11);
       __pyx_t_5 = 0;
       {
         PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_11, NULL};
-        __pyx_t_13 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 121, __pyx_L65_error)
+        __pyx_t_13 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 111, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_13);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_parents, Py_True, __pyx_t_13, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 121, __pyx_L65_error)
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_exist_ok, Py_True, __pyx_t_13, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 121, __pyx_L65_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_parents, Py_True, __pyx_t_13, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 111, __pyx_L65_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_exist_ok, Py_True, __pyx_t_13, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 111, __pyx_L65_error)
         __pyx_t_2 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_mkdir, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_13);
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L65_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "prospero/ariel/encryption.py":122
+      /* "prospero/ariel/encryption.py":112
  *         try:
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(             # <<<<<<<<<<<<<<
@@ -6324,14 +6448,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
 */
       __pyx_t_14 = NULL;
 
-      /* "prospero/ariel/encryption.py":123
+      /* "prospero/ariel/encryption.py":113
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
  *                 b ^ machine_salt[i % len(machine_salt)]             # <<<<<<<<<<<<<<
  *                 for i, b in enumerate(new_key_bytes)
  *             )
 */
-      __pyx_t_13 = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_load_3genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_new_key_bytes); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 123, __pyx_L65_error)
+      __pyx_t_13 = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_5_load_3genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_new_key_bytes); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 113, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_13);
       __pyx_t_5 = 1;
       {
@@ -6339,13 +6463,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)(&PyBytes_Type), __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L65_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 112, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_XDECREF_SET(__pyx_v_obfuscated_bytes, ((PyObject*)__pyx_t_2));
       __pyx_t_2 = 0;
 
-      /* "prospero/ariel/encryption.py":126
+      /* "prospero/ariel/encryption.py":116
  *                 for i, b in enumerate(new_key_bytes)
  *             )
  *             path.write_bytes(obfuscated_bytes)             # <<<<<<<<<<<<<<
@@ -6359,28 +6483,28 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         PyObject *__pyx_callargs[2] = {__pyx_t_13, __pyx_v_obfuscated_bytes};
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_write_bytes, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L65_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "prospero/ariel/encryption.py":128
+      /* "prospero/ariel/encryption.py":118
  *             path.write_bytes(obfuscated_bytes)
  * 
  *             if os.name == "posix":             # <<<<<<<<<<<<<<
  *                 os.chmod(path, 0o600)  # Owner Read/Write only[cite: 1]
  * 
 */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 128, __pyx_L65_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 128, __pyx_L65_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 118, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_posix, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 128, __pyx_L65_error)
+      __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_posix, Py_EQ)); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 118, __pyx_L65_error)
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       if (__pyx_t_6) {
 
-        /* "prospero/ariel/encryption.py":129
+        /* "prospero/ariel/encryption.py":119
  * 
  *             if os.name == "posix":
  *                 os.chmod(path, 0o600)  # Owner Read/Write only[cite: 1]             # <<<<<<<<<<<<<<
@@ -6388,9 +6512,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *             logger.warning("Fallback machine-bound file created at '%s'.", path)
 */
         __pyx_t_2 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 129, __pyx_L65_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 119, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_14);
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_chmod); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 129, __pyx_L65_error)
+        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_chmod); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 119, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         __pyx_t_5 = 1;
@@ -6410,12 +6534,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_13 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_11, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 129, __pyx_L65_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 119, __pyx_L65_error)
           __Pyx_GOTREF(__pyx_t_13);
         }
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-        /* "prospero/ariel/encryption.py":128
+        /* "prospero/ariel/encryption.py":118
  *             path.write_bytes(obfuscated_bytes)
  * 
  *             if os.name == "posix":             # <<<<<<<<<<<<<<
@@ -6424,7 +6548,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
 */
       }
 
-      /* "prospero/ariel/encryption.py":131
+      /* "prospero/ariel/encryption.py":121
  *                 os.chmod(path, 0o600)  # Owner Read/Write only[cite: 1]
  * 
  *             logger.warning("Fallback machine-bound file created at '%s'.", path)             # <<<<<<<<<<<<<<
@@ -6432,9 +6556,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *             logger.critical("Critical security initialization failure: %s", e)
 */
       __pyx_t_11 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L65_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 131, __pyx_L65_error)
+      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_warning); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 121, __pyx_L65_error)
       __Pyx_GOTREF(__pyx_t_14);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_5 = 1;
@@ -6454,14 +6578,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
         __pyx_t_13 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_14, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-        if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 131, __pyx_L65_error)
+        if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 121, __pyx_L65_error)
         __Pyx_GOTREF(__pyx_t_13);
       }
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "prospero/ariel/encryption.py":120
+      /* "prospero/ariel/encryption.py":110
+ *             logger.error("Could not write new key to OS Keyring: %s", e)
  * 
- *         # Write to local file fallback[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
@@ -6480,7 +6604,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "prospero/ariel/encryption.py":132
+    /* "prospero/ariel/encryption.py":122
  * 
  *             logger.warning("Fallback machine-bound file created at '%s'.", path)
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6490,7 +6614,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_t_15 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_15) {
       __Pyx_AddTraceback("prospero.ariel.encryption.EncryptionManager._load", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_13, &__pyx_t_14, &__pyx_t_11) < 0) __PYX_ERR(0, 132, __pyx_L67_except_error)
+      if (__Pyx_GetException(&__pyx_t_13, &__pyx_t_14, &__pyx_t_11) < 0) __PYX_ERR(0, 122, __pyx_L67_except_error)
       __Pyx_XGOTREF(__pyx_t_13);
       __Pyx_XGOTREF(__pyx_t_14);
       __Pyx_XGOTREF(__pyx_t_11);
@@ -6498,7 +6622,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
       __pyx_v_e = __pyx_t_14;
       /*try:*/ {
 
-        /* "prospero/ariel/encryption.py":133
+        /* "prospero/ariel/encryption.py":123
  *             logger.warning("Fallback machine-bound file created at '%s'.", path)
  *         except Exception as e:
  *             logger.critical("Critical security initialization failure: %s", e)             # <<<<<<<<<<<<<<
@@ -6506,9 +6630,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
  *         return self._build([new_key_str])
 */
         __pyx_t_3 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L77_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L77_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_critical); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 133, __pyx_L77_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_critical); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L77_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_t_5 = 1;
@@ -6528,13 +6652,13 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L77_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L77_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       }
 
-      /* "prospero/ariel/encryption.py":132
+      /* "prospero/ariel/encryption.py":122
  * 
  *             logger.warning("Fallback machine-bound file created at '%s'.", path)
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6588,9 +6712,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     }
     goto __pyx_L67_except_error;
 
-    /* "prospero/ariel/encryption.py":120
+    /* "prospero/ariel/encryption.py":110
+ *             logger.error("Could not write new key to OS Keyring: %s", e)
  * 
- *         # Write to local file fallback[cite: 1]
  *         try:             # <<<<<<<<<<<<<<
  *             path.parent.mkdir(parents=True, exist_ok=True)
  *             obfuscated_bytes = bytes(
@@ -6609,7 +6733,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
     __pyx_L70_try_end:;
   }
 
-  /* "prospero/ariel/encryption.py":135
+  /* "prospero/ariel/encryption.py":125
  *             logger.critical("Critical security initialization failure: %s", e)
  * 
  *         return self._build([new_key_str])             # <<<<<<<<<<<<<<
@@ -6619,30 +6743,30 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_14 = __pyx_v_self;
   __Pyx_INCREF(__pyx_t_14);
-  __pyx_t_13 = PyList_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_13 = PyList_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_INCREF(__pyx_v_new_key_str);
   __Pyx_GIVEREF(__pyx_v_new_key_str);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 0, __pyx_v_new_key_str) != (0)) __PYX_ERR(0, 135, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 0, __pyx_v_new_key_str) != (0)) __PYX_ERR(0, 125, __pyx_L1_error);
   __pyx_t_5 = 0;
   {
     PyObject *__pyx_callargs[2] = {__pyx_t_14, __pyx_t_13};
     __pyx_t_11 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_build, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
   }
   __pyx_r = __pyx_t_11;
   __pyx_t_11 = 0;
   goto __pyx_L0;
 
-  /* "prospero/ariel/encryption.py":71
+  /* "prospero/ariel/encryption.py":68
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)
  * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:             # <<<<<<<<<<<<<<
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)
+ *         if raw_env:
 */
 
   /* function exit code */
@@ -6675,7 +6799,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_2_lo
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":137
+/* "prospero/ariel/encryption.py":127
  *         return self._build([new_key_str])
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
@@ -6722,32 +6846,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_keys,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 137, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 127, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 127, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_build", 0) < (0)) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_build", 0) < (0)) __PYX_ERR(0, 127, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_build", 1, 1, 1, i); __PYX_ERR(0, 137, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_build", 1, 1, 1, i); __PYX_ERR(0, 127, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 127, __pyx_L3_error)
     }
     __pyx_v_keys = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_build", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 137, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_build", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 127, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6758,7 +6882,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_keys), (&PyList_Type), 0, "keys", 2))) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_keys), (&PyList_Type), 0, "keys", 2))) __PYX_ERR(0, 128, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_build(__pyx_self, __pyx_v_keys);
 
   /* function exit code */
@@ -6799,7 +6923,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_build", 0);
 
-  /* "prospero/ariel/encryption.py":139
+  /* "prospero/ariel/encryption.py":129
  *     @staticmethod
  *     def _build(keys: List[str]) -> MultiFernet:
  *         fernets: List[Fernet] = [             # <<<<<<<<<<<<<<
@@ -6807,10 +6931,10 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
  *         ]
 */
   { /* enter inner scope */
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L5_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L5_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "prospero/ariel/encryption.py":140
+    /* "prospero/ariel/encryption.py":130
  *     def _build(keys: List[str]) -> MultiFernet:
  *         fernets: List[Fernet] = [
  *             Fernet(k.encode() if isinstance(k, str) else k) for k in keys             # <<<<<<<<<<<<<<
@@ -6823,18 +6947,18 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
         #if !CYTHON_ASSUME_SAFE_SIZE
-        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 140, __pyx_L5_error)
+        if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 130, __pyx_L5_error)
         #endif
         if (__pyx_t_3 >= __pyx_temp) break;
       }
       __pyx_t_4 = __Pyx_PyList_GetItemRefFast(__pyx_t_2, __pyx_t_3, __Pyx_ReferenceSharing_OwnStrongReference);
       ++__pyx_t_3;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L5_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_XDECREF_SET(__pyx_8genexpr4__pyx_v_k, __pyx_t_4);
       __pyx_t_4 = 0;
       __pyx_t_5 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_Fernet); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 140, __pyx_L5_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_Fernet); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L5_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_8 = PyUnicode_Check(__pyx_8genexpr4__pyx_v_k); 
       if (__pyx_t_8) {
@@ -6845,7 +6969,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
           PyObject *__pyx_callargs[2] = {__pyx_t_10, NULL};
           __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_11, (1-__pyx_t_11) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 140, __pyx_L5_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 130, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_9);
         }
         __pyx_t_7 = __pyx_t_9;
@@ -6872,10 +6996,10 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L5_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 139, __pyx_L5_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(0, 129, __pyx_L5_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -6889,7 +7013,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
   __pyx_v_fernets = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "prospero/ariel/encryption.py":142
+  /* "prospero/ariel/encryption.py":132
  *             Fernet(k.encode() if isinstance(k, str) else k) for k in keys
  *         ]
  *         return MultiFernet(fernets)             # <<<<<<<<<<<<<<
@@ -6898,7 +7022,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
 */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_MultiFernet); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_MultiFernet); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_11 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -6917,14 +7041,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "prospero/ariel/encryption.py":137
+  /* "prospero/ariel/encryption.py":127
  *         return self._build([new_key_str])
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
@@ -6952,7 +7076,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_4_bu
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":144
+/* "prospero/ariel/encryption.py":134
  *         return MultiFernet(fernets)
  * 
  *     def encrypt(self, plaintext: str) -> str:             # <<<<<<<<<<<<<<
@@ -7000,39 +7124,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_self,&__pyx_mstate_global->__pyx_n_u_plaintext,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 144, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 134, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 144, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 134, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 144, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "encrypt", 0) < (0)) __PYX_ERR(0, 144, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "encrypt", 0) < (0)) __PYX_ERR(0, 134, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("encrypt", 1, 2, 2, i); __PYX_ERR(0, 144, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("encrypt", 1, 2, 2, i); __PYX_ERR(0, 134, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 144, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 134, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 144, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 134, __pyx_L3_error)
     }
     __pyx_v_self = values[0];
     __pyx_v_plaintext = ((PyObject*)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("encrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 144, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("encrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 134, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7043,7 +7167,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_plaintext), (&PyUnicode_Type), 0, "plaintext", 2))) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_plaintext), (&PyUnicode_Type), 0, "plaintext", 2))) __PYX_ERR(0, 134, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6encrypt(__pyx_self, __pyx_v_self, __pyx_v_plaintext);
 
   /* function exit code */
@@ -7078,7 +7202,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6enc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("encrypt", 0);
 
-  /* "prospero/ariel/encryption.py":145
+  /* "prospero/ariel/encryption.py":135
  * 
  *     def encrypt(self, plaintext: str) -> str:
  *         return self._fernet.encrypt(plaintext.encode()).decode()             # <<<<<<<<<<<<<<
@@ -7086,11 +7210,11 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6enc
  *     def decrypt(self, token: str) -> str:
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_4 = __pyx_t_5;
   __Pyx_INCREF(__pyx_t_4);
-  __pyx_t_6 = PyUnicode_AsEncodedString(__pyx_v_plaintext, NULL, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_6 = PyUnicode_AsEncodedString(__pyx_v_plaintext, NULL, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = 0;
   {
@@ -7099,7 +7223,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6enc
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
   __pyx_t_2 = __pyx_t_3;
@@ -7110,15 +7234,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6enc
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_decode, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 135, __pyx_L1_error)
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "prospero/ariel/encryption.py":144
+  /* "prospero/ariel/encryption.py":134
  *         return MultiFernet(fernets)
  * 
  *     def encrypt(self, plaintext: str) -> str:             # <<<<<<<<<<<<<<
@@ -7142,7 +7266,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_6enc
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":147
+/* "prospero/ariel/encryption.py":137
  *         return self._fernet.encrypt(plaintext.encode()).decode()
  * 
  *     def decrypt(self, token: str) -> str:             # <<<<<<<<<<<<<<
@@ -7190,39 +7314,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_self,&__pyx_mstate_global->__pyx_n_u_token,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 147, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 137, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 147, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 137, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "decrypt", 0) < (0)) __PYX_ERR(0, 147, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "decrypt", 0) < (0)) __PYX_ERR(0, 137, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("decrypt", 1, 2, 2, i); __PYX_ERR(0, 147, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("decrypt", 1, 2, 2, i); __PYX_ERR(0, 137, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 137, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 147, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 137, __pyx_L3_error)
     }
     __pyx_v_self = values[0];
     __pyx_v_token = ((PyObject*)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("decrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 147, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("decrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 137, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7233,7 +7357,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_token), (&PyUnicode_Type), 0, "token", 2))) __PYX_ERR(0, 147, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_token), (&PyUnicode_Type), 0, "token", 2))) __PYX_ERR(0, 137, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8decrypt(__pyx_self, __pyx_v_self, __pyx_v_token);
 
   /* function exit code */
@@ -7273,7 +7397,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("decrypt", 0);
 
-  /* "prospero/ariel/encryption.py":148
+  /* "prospero/ariel/encryption.py":138
  * 
  *     def decrypt(self, token: str) -> str:
  *         try:             # <<<<<<<<<<<<<<
@@ -7289,7 +7413,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "prospero/ariel/encryption.py":149
+      /* "prospero/ariel/encryption.py":139
  *     def decrypt(self, token: str) -> str:
  *         try:
  *             return self._fernet.decrypt(token.encode()).decode()             # <<<<<<<<<<<<<<
@@ -7297,11 +7421,11 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
  *             logger.error("Failed to decrypt value: Token is invalid or key mismatch.")
 */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 149, __pyx_L3_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_mstate_global->__pyx_n_u_fernet); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 139, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_7 = __pyx_t_8;
       __Pyx_INCREF(__pyx_t_7);
-      __pyx_t_9 = PyUnicode_AsEncodedString(__pyx_v_token, NULL, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 149, __pyx_L3_error)
+      __pyx_t_9 = PyUnicode_AsEncodedString(__pyx_v_token, NULL, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 139, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_t_10 = 0;
       {
@@ -7310,7 +7434,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 149, __pyx_L3_error)
+        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_6);
       }
       __pyx_t_5 = __pyx_t_6;
@@ -7321,15 +7445,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_decode, __pyx_callargs+__pyx_t_10, (1-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 149, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
-      if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 149, __pyx_L3_error)
+      if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 139, __pyx_L3_error)
       __pyx_r = ((PyObject*)__pyx_t_4);
       __pyx_t_4 = 0;
       goto __pyx_L7_try_return;
 
-      /* "prospero/ariel/encryption.py":148
+      /* "prospero/ariel/encryption.py":138
  * 
  *     def decrypt(self, token: str) -> str:
  *         try:             # <<<<<<<<<<<<<<
@@ -7345,7 +7469,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "prospero/ariel/encryption.py":150
+    /* "prospero/ariel/encryption.py":140
  *         try:
  *             return self._fernet.decrypt(token.encode()).decode()
  *         except InvalidToken:             # <<<<<<<<<<<<<<
@@ -7353,7 +7477,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
  *             raise
 */
     __Pyx_ErrFetch(&__pyx_t_4, &__pyx_t_6, &__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_InvalidToken); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 150, __pyx_L5_except_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_InvalidToken); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 140, __pyx_L5_except_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_11 = __Pyx_PyErr_GivenExceptionMatches(__pyx_t_4, __pyx_t_8);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -7361,12 +7485,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
     __pyx_t_4 = 0; __pyx_t_6 = 0; __pyx_t_5 = 0;
     if (__pyx_t_11) {
       __Pyx_AddTraceback("prospero.ariel.encryption.EncryptionManager.decrypt", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_6, &__pyx_t_4) < 0) __PYX_ERR(0, 150, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_6, &__pyx_t_4) < 0) __PYX_ERR(0, 140, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_5);
       __Pyx_XGOTREF(__pyx_t_6);
       __Pyx_XGOTREF(__pyx_t_4);
 
-      /* "prospero/ariel/encryption.py":151
+      /* "prospero/ariel/encryption.py":141
  *             return self._fernet.decrypt(token.encode()).decode()
  *         except InvalidToken:
  *             logger.error("Failed to decrypt value: Token is invalid or key mismatch.")             # <<<<<<<<<<<<<<
@@ -7374,9 +7498,9 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
  * 
 */
       __pyx_t_9 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 151, __pyx_L5_except_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 141, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 151, __pyx_L5_except_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_error); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 141, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_10 = 1;
@@ -7396,12 +7520,12 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
         __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_12, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 151, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 141, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_8);
       }
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "prospero/ariel/encryption.py":152
+      /* "prospero/ariel/encryption.py":142
  *         except InvalidToken:
  *             logger.error("Failed to decrypt value: Token is invalid or key mismatch.")
  *             raise             # <<<<<<<<<<<<<<
@@ -7413,11 +7537,11 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
       __Pyx_XGIVEREF(__pyx_t_4);
       __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_6, __pyx_t_4);
       __pyx_t_5 = 0;  __pyx_t_6 = 0;  __pyx_t_4 = 0; 
-      __PYX_ERR(0, 152, __pyx_L5_except_error)
+      __PYX_ERR(0, 142, __pyx_L5_except_error)
     }
     goto __pyx_L5_except_error;
 
-    /* "prospero/ariel/encryption.py":148
+    /* "prospero/ariel/encryption.py":138
  * 
  *     def decrypt(self, token: str) -> str:
  *         try:             # <<<<<<<<<<<<<<
@@ -7438,7 +7562,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
     goto __pyx_L0;
   }
 
-  /* "prospero/ariel/encryption.py":147
+  /* "prospero/ariel/encryption.py":137
  *         return self._fernet.encrypt(plaintext.encode()).decode()
  * 
  *     def decrypt(self, token: str) -> str:             # <<<<<<<<<<<<<<
@@ -7463,7 +7587,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_8dec
   return __pyx_r;
 }
 
-/* "prospero/ariel/encryption.py":154
+/* "prospero/ariel/encryption.py":144
  *             raise
  * 
  *     def rotate_reencrypt(self, ciphertext: str) -> str:             # <<<<<<<<<<<<<<
@@ -7511,39 +7635,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_self,&__pyx_mstate_global->__pyx_n_u_ciphertext,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 154, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len < 0)) __PYX_ERR(0, 144, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 154, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 144, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 154, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 144, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "rotate_reencrypt", 0) < (0)) __PYX_ERR(0, 154, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "rotate_reencrypt", 0) < (0)) __PYX_ERR(0, 144, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("rotate_reencrypt", 1, 2, 2, i); __PYX_ERR(0, 154, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("rotate_reencrypt", 1, 2, 2, i); __PYX_ERR(0, 144, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 154, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 144, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 154, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 144, __pyx_L3_error)
     }
     __pyx_v_self = values[0];
     __pyx_v_ciphertext = ((PyObject*)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("rotate_reencrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 154, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("rotate_reencrypt", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 144, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7554,7 +7678,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ciphertext), (&PyUnicode_Type), 0, "ciphertext", 2))) __PYX_ERR(0, 154, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ciphertext), (&PyUnicode_Type), 0, "ciphertext", 2))) __PYX_ERR(0, 144, __pyx_L1_error)
   __pyx_r = __pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_10rotate_reencrypt(__pyx_self, __pyx_v_self, __pyx_v_ciphertext);
 
   /* function exit code */
@@ -7586,7 +7710,7 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_10ro
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("rotate_reencrypt", 0);
 
-  /* "prospero/ariel/encryption.py":155
+  /* "prospero/ariel/encryption.py":145
  * 
  *     def rotate_reencrypt(self, ciphertext: str) -> str:
  *         plaintext: str = self.decrypt(ciphertext)             # <<<<<<<<<<<<<<
@@ -7600,14 +7724,14 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_10ro
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_ciphertext};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_decrypt, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 155, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 145, __pyx_L1_error)
   __pyx_v_plaintext = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "prospero/ariel/encryption.py":156
+  /* "prospero/ariel/encryption.py":146
  *     def rotate_reencrypt(self, ciphertext: str) -> str:
  *         plaintext: str = self.decrypt(ciphertext)
  *         return self.encrypt(plaintext)             # <<<<<<<<<<<<<<
@@ -7622,15 +7746,15 @@ static PyObject *__pyx_pf_8prospero_5ariel_10encryption_17EncryptionManager_10ro
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_plaintext};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_encrypt, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 146, __pyx_L1_error)
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "prospero/ariel/encryption.py":154
+  /* "prospero/ariel/encryption.py":144
  *             raise
  * 
  *     def rotate_reencrypt(self, ciphertext: str) -> str:             # <<<<<<<<<<<<<<
@@ -8524,15 +8648,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr)) __PYX_ERR(0, 22, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr) < (0)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr)) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr) < (0)) __PYX_ERR(0, 21, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr = &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr) < (0)) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr) < (0)) __PYX_ERR(0, 21, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_1_genexpr);
@@ -8543,15 +8667,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_2__load_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load)) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_2__load_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_2__load_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_2__load_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load = &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_2__load;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_2__load);
@@ -8562,15 +8686,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr)) __PYX_ERR(0, 100, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr) < (0)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr)) __PYX_ERR(0, 93, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr) < (0)) __PYX_ERR(0, 93, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr = &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr) < (0)) __PYX_ERR(0, 100, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr) < (0)) __PYX_ERR(0, 93, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_3_genexpr);
@@ -8581,15 +8705,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr)) __PYX_ERR(0, 123, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr) < (0)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr)) __PYX_ERR(0, 113, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr_spec, __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr) < (0)) __PYX_ERR(0, 113, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr = &__pyx_type_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr) < (0)) __PYX_ERR(0, 123, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr) < (0)) __PYX_ERR(0, 113, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_8prospero_5ariel_10encryption___pyx_scope_struct_4_genexpr);
@@ -9111,8 +9235,8 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -9130,15 +9254,15 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_unscramble, __pyx_t_6) < (0)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":26
+  /* "prospero/ariel/encryption.py":24
  * 
- * # Scrambled versions of "ArielApplication" and "DatabaseEncryptionKey"
+ * 
  * SERVICE_NAME: str = _unscramble("KzAnJiY6KyMmKy8tJQ==")             # <<<<<<<<<<<<<<
  * ACCOUNT_NAME: str = _unscramble("DiY0KTA4YTMvJyY6MTA2OyVfJQ==")
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_unscramble); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_unscramble); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_7 = 1;
   {
@@ -9146,21 +9270,21 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
     __pyx_t_6 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 26, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
   }
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME, __pyx_t_6) < (0)) __PYX_ERR(0, 26, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_SERVICE_NAME, __pyx_t_6) < (0)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":27
- * # Scrambled versions of "ArielApplication" and "DatabaseEncryptionKey"
+  /* "prospero/ariel/encryption.py":25
+ * 
  * SERVICE_NAME: str = _unscramble("KzAnJiY6KyMmKy8tJQ==")
  * ACCOUNT_NAME: str = _unscramble("DiY0KTA4YTMvJyY6MTA2OyVfJQ==")             # <<<<<<<<<<<<<<
  * 
  * 
 */
   __pyx_t_5 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_unscramble); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_unscramble); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_7 = 1;
   {
@@ -9168,55 +9292,55 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
     __pyx_t_6 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 27, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
   }
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME, __pyx_t_6) < (0)) __PYX_ERR(0, 27, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_ACCOUNT_NAME, __pyx_t_6) < (0)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":30
+  /* "prospero/ariel/encryption.py":28
  * 
  * 
  * def get_robust_machine_id() -> str:             # <<<<<<<<<<<<<<
- *     """Queries persistent hardware identifiers to bind the fallback key to the machine physical hardware."""
  *     try:
+ *         if sys.platform == "win32":
 */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 30, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_3get_robust_machine_id, 0, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_3get_robust_machine_id, 0, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
   #endif
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_2, __pyx_t_6);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id, __pyx_t_2) < (0)) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_get_robust_machine_id, __pyx_t_2) < (0)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "prospero/ariel/encryption.py":63
+  /* "prospero/ariel/encryption.py":60
  * 
  * 
  * class EncryptionManager:             # <<<<<<<<<<<<<<
  *     def __init__(
  *         self,
 */
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_mstate_global->__pyx_empty_tuple, __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_mstate_global->__pyx_n_u_EncryptionManager, (PyObject *) NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_mstate_global->__pyx_empty_tuple, __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_mstate_global->__pyx_n_u_EncryptionManager, (PyObject *) NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "prospero/ariel/encryption.py":64
+  /* "prospero/ariel/encryption.py":61
  * 
  * class EncryptionManager:
  *     def __init__(             # <<<<<<<<<<<<<<
  *         self,
  *         env_var: str = "ARIEL_ENCRYPTION_KEY",
 */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_env_var, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 64, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_fallback_key_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 64, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_None) < (0)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_1__init__, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager___init, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_env_var, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 61, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_fallback_key_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 61, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_None) < (0)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_1__init__, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager___init, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
@@ -9224,32 +9348,32 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_5, __pyx_mstate_global->__pyx_tuple[2]);
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_5, __pyx_t_6);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_init, __pyx_t_5) < (0)) __PYX_ERR(0, 64, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_init, __pyx_t_5) < (0)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "prospero/ariel/encryption.py":71
+  /* "prospero/ariel/encryption.py":68
  *         self._fernet: MultiFernet = self._load(env_var, fallback_key_path)
  * 
  *     def _load(self, env_var: str, fallback_key_path: str) -> MultiFernet:             # <<<<<<<<<<<<<<
- *         # 1. Environment Variable Override (highest priority)[cite: 1]
  *         raw_env: Optional[str] = os.environ.get(env_var)
+ *         if raw_env:
 */
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_env_var, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_fallback_key_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_MultiFernet) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_3_load, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_env_var, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_fallback_key_path, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_MultiFernet) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_3_load, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager__load, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_6);
   #endif
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_6, __pyx_t_5);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_load, __pyx_t_6) < (0)) __PYX_ERR(0, 71, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_load, __pyx_t_6) < (0)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":137
+  /* "prospero/ariel/encryption.py":127
  *         return self._build([new_key_str])
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
@@ -9257,11 +9381,11 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
  *         fernets: List[Fernet] = [
 */
   __pyx_t_5 = NULL;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_keys, __pyx_mstate_global->__pyx_kp_u_List_str) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_MultiFernet) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_5_build, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_mstate_global->__pyx_n_u_EncryptionManager__build, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_keys, __pyx_mstate_global->__pyx_kp_u_List_str) < (0)) __PYX_ERR(0, 127, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_MultiFernet) < (0)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_5_build, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_mstate_global->__pyx_n_u_EncryptionManager__build, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_8);
@@ -9274,98 +9398,98 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
     __pyx_t_6 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_staticmethod, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
   }
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_build, __pyx_t_6) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_build, __pyx_t_6) < (0)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":144
+  /* "prospero/ariel/encryption.py":134
  *         return MultiFernet(fernets)
  * 
  *     def encrypt(self, plaintext: str) -> str:             # <<<<<<<<<<<<<<
  *         return self._fernet.encrypt(plaintext.encode()).decode()
  * 
 */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_plaintext, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_7encrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_encrypt, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_plaintext, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_7encrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_encrypt, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_8);
   #endif
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_8, __pyx_t_6);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_encrypt, __pyx_t_8) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_encrypt, __pyx_t_8) < (0)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-  /* "prospero/ariel/encryption.py":147
+  /* "prospero/ariel/encryption.py":137
  *         return self._fernet.encrypt(plaintext.encode()).decode()
  * 
  *     def decrypt(self, token: str) -> str:             # <<<<<<<<<<<<<<
  *         try:
  *             return self._fernet.decrypt(token.encode()).decode()
 */
-  __pyx_t_8 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  if (PyDict_SetItem(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_token, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 147, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 147, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_9decrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_decrypt, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 147, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_token, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_9decrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_decrypt, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_6);
   #endif
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_6, __pyx_t_8);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_decrypt, __pyx_t_6) < (0)) __PYX_ERR(0, 147, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_decrypt, __pyx_t_6) < (0)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "prospero/ariel/encryption.py":154
+  /* "prospero/ariel/encryption.py":144
  *             raise
  * 
  *     def rotate_reencrypt(self, ciphertext: str) -> str:             # <<<<<<<<<<<<<<
  *         plaintext: str = self.decrypt(ciphertext)
  *         return self.encrypt(plaintext)
 */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_ciphertext, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 154, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 154, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_11rotate_reencrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_rotate_reencry, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 154, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_ciphertext, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_return, __pyx_mstate_global->__pyx_n_u_str) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_CyFunction_New(&__pyx_mdef_8prospero_5ariel_10encryption_17EncryptionManager_11rotate_reencrypt, 0, __pyx_mstate_global->__pyx_n_u_EncryptionManager_rotate_reencry, NULL, __pyx_mstate_global->__pyx_n_u_prospero_ariel_encryption, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_8);
   #endif
   __Pyx_CyFunction_SetAnnotationsDict(__pyx_t_8, __pyx_t_6);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_rotate_reencrypt, __pyx_t_8) < (0)) __PYX_ERR(0, 154, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_rotate_reencrypt, __pyx_t_8) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-  /* "prospero/ariel/encryption.py":63
+  /* "prospero/ariel/encryption.py":60
  * 
  * 
  * class EncryptionManager:             # <<<<<<<<<<<<<<
  *     def __init__(
  *         self,
 */
-  __pyx_t_8 = __Pyx_Py3ClassCreate(((PyObject*)&PyType_Type), __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_mstate_global->__pyx_empty_tuple, __pyx_t_2, NULL, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_Py3ClassCreate(((PyObject*)&PyType_Type), __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_mstate_global->__pyx_empty_tuple, __pyx_t_2, NULL, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_8);
   #endif
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_t_8) < (0)) __PYX_ERR(0, 63, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_EncryptionManager, __pyx_t_8) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "prospero/ariel/encryption.py":160
+  /* "prospero/ariel/encryption.py":149
  * 
- * # Module-level singleton[cite: 1]
+ * 
  * encryption_manager = EncryptionManager()             # <<<<<<<<<<<<<<
 */
   __pyx_t_8 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_EncryptionManager); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_EncryptionManager); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = 1;
   {
@@ -9373,10 +9497,10 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
     __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 149, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_encryption_manager, __pyx_t_2) < (0)) __PYX_ERR(0, 160, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_encryption_manager, __pyx_t_2) < (0)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "prospero/ariel/encryption.py":1
@@ -9429,8 +9553,8 @@ __Pyx_RefNannySetupContext("PyInit_encryption", 0);
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 137, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 94, __pyx_L1_error)
 
   /* Cached unbound methods */
   __pyx_mstate->__pyx_umethod_PyDict_Type_items.type = (PyObject*)&PyDict_Type;
@@ -9450,14 +9574,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "prospero/ariel/encryption.py":43
+  /* "prospero/ariel/encryption.py":41
+ *                     return line.split('"')[-2].strip()
  *         else:
- *             # Linux / Raspberry Pi: Check product UUID, fallback to Pi CPU Serial or machine-id[cite: 1]
  *             for path in [             # <<<<<<<<<<<<<<
  *                 "/sys/class/dmi/id/product_uuid",
  *                 "/etc/machine-id",
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_kp_u_sys_class_dmi_id_product_uuid, __pyx_mstate_global->__pyx_kp_u_etc_machine_id, __pyx_mstate_global->__pyx_kp_u_proc_cpuinfo); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(3, __pyx_mstate_global->__pyx_kp_u_sys_class_dmi_id_product_uuid, __pyx_mstate_global->__pyx_kp_u_etc_machine_id, __pyx_mstate_global->__pyx_kp_u_proc_cpuinfo); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
 
@@ -9465,21 +9589,21 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
  * 
  * 
  * def _unscramble(scrambled_b64: str, key: int = 0x5A) -> str:             # <<<<<<<<<<<<<<
- *     """Decodes scrambled string constants at runtime to hide them from static analysis."""
  *     decoded_bytes = base64.b64decode(scrambled_b64)
+ *     return "".join(chr(b ^ key) for b in decoded_bytes)
 */
   __pyx_mstate_global->__pyx_tuple[1] = PyTuple_Pack(1, ((PyObject*)__pyx_mstate_global->__pyx_int_90)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[1])) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[1]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[1]);
 
-  /* "prospero/ariel/encryption.py":64
+  /* "prospero/ariel/encryption.py":61
  * 
  * class EncryptionManager:
  *     def __init__(             # <<<<<<<<<<<<<<
  *         self,
  *         env_var: str = "ARIEL_ENCRYPTION_KEY",
 */
-  __pyx_mstate_global->__pyx_tuple[2] = PyTuple_Pack(2, ((PyObject*)__pyx_mstate_global->__pyx_n_u_ARIEL_ENCRYPTION_KEY), ((PyObject*)__pyx_mstate_global->__pyx_kp_u_static_ariel_key_fallback)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[2])) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[2] = PyTuple_Pack(2, ((PyObject*)__pyx_mstate_global->__pyx_n_u_ARIEL_ENCRYPTION_KEY), ((PyObject*)__pyx_mstate_global->__pyx_kp_u_static_ariel_key_fallback)); if (unlikely(!__pyx_mstate_global->__pyx_tuple[2])) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[2]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[2]);
   #if CYTHON_IMMORTAL_CONSTANTS
@@ -9516,31 +9640,31 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   {
-    const struct { const unsigned int length: 9; } index[] = {{0},{55},{41},{44},{28},{61},{58},{36},{44},{49},{20},{9},{39},{179},{47},{1},{1},{1},{1},{1},{1},{8},{7},{6},{15},{2},{58},{9},{13},{28},{26},{30},{23},{12},{20},{17},{26},{24},{23},{40},{25},{25},{34},{6},{12},{4},{11},{4},{8},{4},{20},{12},{6},{7},{12},{18},{1},{9},{6},{6},{12},{5},{10},{17},{18},{5},{3},{7},{8},{19},{6},{6},{13},{7},{7},{1},{6},{7},{18},{9},{7},{7},{5},{8},{6},{17},{7},{7},{8},{12},{7},{3},{9},{12},{21},{7},{1},{4},{8},{3},{13},{5},{1},{3},{9},{7},{4},{4},{5},{6},{7},{12},{8},{13},{5},{10},{4},{8},{13},{11},{4},{16},{2},{6},{1},{6},{7},{4},{7},{9},{8},{3},{5},{11},{25},{12},{7},{10},{9},{6},{16},{13},{4},{4},{12},{12},{10},{5},{5},{12},{10},{3},{5},{10},{3},{8},{5},{5},{6},{11},{28},{4},{5},{6},{7},{5},{11},{429},{29},{48},{31},{46},{2},{2},{235},{28},{33}};
-    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (2021 bytes) */
-const char* const cstring = "BZh91AY&SY\265\037\301\013\000\001\021\177\377\377\376\377\377\377\377\377\327\277\377\377\373\277\377\377\377@@@@@@@@@@@@@\000@\000`\006\377<\325Zu\317ws\247\257Y\227wi2\316xs\341\251\241\t=\rQ\354\214\251\233A0\230\236\247\252=14\322i\220\331\01044\310\323F\206\206\203Fjh\323Lh\010\331M\006\210\231\032biCeO\323M@\322~\242i\221\210\032\000\000\000\000\000\000\000\000\032\000\001\2424\001!\222\236)\352\006\201\232\214\236\247\250\001\221\240\000\000\001\220\000\000\r=@\001\240\006\232L\202ji\246\223\320T\360\322\237\252z\236\243\365CCCCF\217P\032\000\000\000\320\r4\000\320\320m@\320\0202a0\002d\300\000& `\000\000\004\300\230\004`\000\002`\000\000\004\251\352\020ORc\"z\247\243$\365\003@\001\352\000\000\000\0004\000\000=OP\014@\r\017)\222Y\000\302wO\3233\260\340v\004\364,\0170\247\273?=@$\250\242\220\224\237@\010\242f\202\035\006A$$\304\230'\266\223\t\276\317\226\310G\024\020\326J\200I\203*,\363~\251\2526\302\220\310\212\202d\022L77b\242;Xe\2547\2019\226\265\010\304\014\252\241\025\367\334>YQ\2465\256\022\025\222b\256\236\256\"\234\026a\223F<\260\200P\353\302C \225UU#$\251E\316\003\212\334.\356\342x>\3746`l)\300\\(\205\341\347\375C\336^\032\370v\2560\302\343\300X\201\031z\220\244G\361\036\237\354\314]\204\177yd.n\005\316au$\036@\326\026\262\264\300U\245@iW\345\276\037\007\2378 >D\240>L\303\345b)AE\263e\021\2240@\246\312[ \316&kf;\370>\225\024\322\253]0\326GN\365M\3005zeF\252\373\241w\333\256\215\252^\234i`N\337;n\002\022\215 \342\273\251B\013\244\202\237\rd\254\321\307\213_\324\267\264\312C\013\303\321\213\312\031\021\223H\326\233l\2071\324\242\243W\006en\014\263\312@\205\302,\323#,\277\203:Rrr\353\207#x\302\021\322G\232\204L\223\371\266\304Fi\261\000d\245\333\346\341u?i\323\255\226\235\350\216\342\254\350?PN\262\305\006\303M\255N+\236\265\220$\334\271r|\023A`A\264\212\275\r\333\200\"\324\211\260\365\364~x^J\"\371P\006\022\215@KF\222U4\331%\200\223\027\364=-\212\376\331\301\303\3461p\300<\314\334\364%\025:\030M\003\026\n\215\347\237g\256\263\364c\302\233\221@\324pNg""\034\016\003\274\024\212\265\210c\003\255\330<\031\003\214\243O\203\002\352\206>j\216\263a\341}\007\302\355\316\317\r\203e\222b6\035E\343\21053.\200D\234H\217C\"\2100T\243\361\026\225\201^5 )u\221\0260\021\020* \\\3047\024y[xn\310V\252\321\r\341\024%h\030\370(\232\036@O\3465\321\242\353k)\301T\271\346\007=\241v\034R&\001Vh\001\371c\241\303\217\234L\026\016&%\225\256\222\006(t&\255\346+E\006\030Y\322\222\305\242\277m\310\017\342\031\371xo\036\312ST\3568\310\016\024`\306\010\2316\326\001\002\",\360\225\027\013\254\241/\035\264\244\037I\321\000\243\025\220\256\353\313S Y\354f\t\220\3537m\003\330\276\"\224n\nR\344\332\30710HD\314Z\372\222\34107\030\220L\236\002\0001\206\361\203\253\030HsUM\225\264VC\237E\212\356\016(\233'A\324\270\272\232\234\360\0365K\261%\003\305\270\331\020\215\000\344&K\235\347\014\003\221\006\004\220Y\200\236j\321B7S\232\311G\264\252\323h\2434\325j\327\273\227\356!\003\025\274\013\032\331&u5s\240\215\031\341&|\334e\224T \243P\231\245)\000\254Km\306*\330\232\246k\t\025y\206\272\0141\305iEJ$UI\305\2031f#\034\014\263\361\260\r\202\247*\252D\020'x\010\0337\370\271\273{i\303\225\t\303\261\321\023\311\004\201\215\032\260\337nKe!\217h\221\372\343I\001X\232\032i\016D\\%\312\021%\336\232\003z\352\202\005$\005\277\221\251\267x\256\020\320\035S\2571w\327\255w0\200t\032s\270\3241\243T.\266F\344\204\005\021\223 \370XIc\331\201\214\261\033f\230\002$\264b\221\022;\026\215\341\2721\nE:\034\342d\373n\212\355`!\243\n\303.i'\rM8\250{\266N\244\310\346;\265@\206\264!D\025Z\312\32234!\000\312Ab\203\033#\"\000-\210p\230\364\205\2255e)\3111\240\220\231h\021\350\232\\/\276\341\211\332O0/M\243\024\370\355e\303\253V\234\303P\253\265p\234\340\034\204\232=\200\330\313\n\251j0\336\241\000\230\340\340\247\200\363\002f\260\265H\202\010T\322F\021\0032k\206#\354\210:\"\020\006@\362\025&\021\330\360\3348\010v\030@+\353\316\005\271\2345\326LY\314\007$\205\264(\205\234\221\2113d\027A\306\265\024\003\244\245Bp`\332un1\202\204\361\242\200\311\247Y`FY2\246\352\204\340\333r^\212\022<G""\275H\306J$@e\230\264\"1\237|_\003\006\263\006NU\366\222\216{\244\005\017\3008\204\013-`C=C(\n\354\317\256WF\300k\214Jm|OZ\342Z\"\324\244\221Q\035\243\035\363\311)\031\005\311\022C\332\005\242\002\372E\231\r\031\014q\205\271\344\010]\273\206\201e\360\270\246\032/\030!1h\325\035W\037\240\244=q\255K\213*6\246\022c\036Ho\225\352\361XF\030\242\312V\004`\304\034\027aP\205\002y\352\320\327k\220[8\310N\362\261Q\205\312%\233-\260F\363\215\016\305\235\260\212\340\366\031\022\2226$\001Z\340\242l\312B)\n),\210/8\353\nM\t\027\200V*\326\331\002\n\342\013T\010L\252h\n\262i\253\225\t\002\\\326\247\231AO\\\2376\034\240\2320*\027\252\375\310\013\202e`\261\312\270\215W\264(\232x\226'\030D\343\274\247:0f$\251\231A\356y\205\323\010\323LK5\225\014H\210\306\025\256jD\273\331\252n`\262\016\032\006\000T\020T\235@\312\335\226\274\363\266*\005\203\202\302\270C\007\203\305i[\031\257\247W]R\274\356\242\252dc\215\207~\361\333E\274\242\360iV\315\007s\320\221\215\351\274\216z\003\341\232\202\340\"\3719\177\310|\344\334\274\314\337\215i\231`o\323\234\214\201\263\245\336\335\032\343X\036\3677\020\221SoQ\274\362.?w\016>\260\230\025R[\345\237\3766\306\227%Z;;vimR\025\271\010\216s\216\326\231\357\r\244\226\030\022>\205B\206\020@v0\306\346\350\221\350\261\275a\t\027\271%\034\245\307\027y\345;\271wR>O\224I\257\313\257\253\217\037\242\274\272\327j\007nVtU\266%\272i\231\271\324\352j\242\274\234]\016\016\346f\201\257\364o\031\255*M?\224\310z&S\332\003w.\235\351\363Y\310\351\2618af\006\230\306ep\266)J\337\314\366\177\260\341\243 7\231\262\253\220\234@\234v`\337\206\323\272\226\275\035\000\270\205\003S\026\326\275go2\004\314\365\007\034D!\006,:!\247\025\236l \r\014\324\212X\201\230[sM\220@\266/O\231Waw$S\205\t\013Q\374\020\260";
-    PyObject *data = __Pyx_DecompressString(cstring, 2021, 2);
+    const struct { const unsigned int length: 9; } index[] = {{0},{55},{41},{44},{28},{61},{58},{36},{44},{49},{20},{9},{39},{179},{47},{1},{1},{1},{1},{1},{1},{8},{2},{7},{6},{15},{2},{9},{13},{28},{4},{26},{30},{12},{20},{17},{26},{24},{23},{40},{25},{25},{34},{6},{22},{14},{12},{4},{11},{4},{8},{4},{20},{12},{6},{7},{12},{18},{1},{9},{6},{6},{12},{5},{10},{17},{18},{5},{3},{7},{8},{19},{9},{6},{6},{13},{7},{7},{1},{6},{7},{18},{9},{7},{7},{5},{8},{6},{17},{7},{7},{8},{12},{7},{3},{9},{12},{21},{7},{1},{4},{8},{3},{5},{13},{5},{1},{3},{9},{7},{4},{4},{5},{6},{7},{12},{8},{13},{5},{10},{4},{8},{13},{11},{4},{16},{2},{6},{1},{6},{7},{4},{7},{9},{8},{3},{5},{11},{25},{12},{7},{10},{9},{6},{16},{13},{4},{4},{12},{12},{10},{5},{12},{10},{3},{5},{10},{3},{8},{5},{5},{6},{11},{28},{4},{5},{6},{7},{5},{4},{11},{419},{29},{48},{31},{46},{2},{2},{264},{28},{33}};
+    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (2039 bytes) */
+const char* const cstring = "BZh91AY&SY\254\206\0104\000\001\014\177\377\377\376\377\377\377\377\377\367\277\377\377\373\277\377\377\373@@@@@@@@@@@@@\000@\000`\006\376;{\315\323\\\356\333\326k\245\253\262\351\2733}\360\363\rS\322&\324\325<\325=0iC\365=\032ji\224\362\237\242jx\231O(\304\323j<\241\265\017SM4\365\r\017P\r\036Hz\236\243\332F\246\207\246\247\2504@\203\020\224\3752\236\223&#)\351\250z\215\000\365=@\000\000\000\000\000\000\000\032\000\000\3214\000\221\211O\324\t\352=M=M\032\017SM\000h\000\000\000\003@\000\000\320\000\000\003S\322hT\360D\332\247\233TjzG\251\352=G\251\243M\014\200\032\006\324\000\000\000\000\000\000\000\000\tM$\320\024`\231\r4@\003C@\000\000\000\000\000\000\017P\000\000\001\221\241\0256\251\220\311\221\200L\230L\232i\246\000\004\304da\014\206F\214\000\004\304\311\220`\203\000\004\255\230v\017\303~s2\340\262\335\344wO\227\014\305$?\255@U4\223\025\363Zx\304\377&\315\245\010I!&B\004\210\n\340}a.$cJ\035\246I\000\2206\n\303\2367d\257\214:$fq\247BM\006\275\217+\313b\335\232\241\220+\211\352\250gAj\224B\010\324\274\322Uo\212\347\001\216\216\023p\242X\232&\207\260_\206z\232\250\264\210\024\363ji\220~\010\347M\324$\211\031pl\001\307\302\364\316l%u\034D\342.\354\3770a\303\314RV\3165UPX'\200\203\005\037u\371}UK\224?\355\n\013\215\000\270\322(\222\001\320\006f\331T\\@\037a\205Z\254 a\010\273p$_3\264\214h\010\311\237\026K\314\207ul\311\2041VM&\030\261\t\271\262\323\233\343ATf\332\223t\306\215d\025\220-\362\r\002\334}@\213\212\321c\320k\213\346\251\005\377r(X\020e\006\014(\256\222(\226r\016\256\334H\360L;\233\373\307\363\240\351P\361\342\266\241d\020\001\316s\030kn\240\t\006%\232h\227/^3\207l8DhC=b\356p\361~\276\257\025\025C-\002\031)_\3423H\307L\230\372\336WA\375'\252(\035\326Mxg}\204\366\350\353%\367~\274\363\256\014\370il\363d\254 \254}HG\211q\332A\200\343\216Hy)\\\n\205k\247G/;\346\240Z\204\033\255\250\307#\335\271\201D\300\035\027P\337\010\362\264R\271$\302U\222b\375\217CU{l\340\341\362\027s\010bA\352S\327\n\251\322\316\320.J\270[nt\rC\316\227$h\253\"\262R\343\231\010\213\002l%""\005:\257G>$\363.\300\342(zo\035\362\272@\335\243\013\330\r\367D\3573\016\r\352\205\246\014\234\312tE\317\234,\226\222 \2108@\216N*\006\250Fg;rV\022\204\232\023\220\020\271 D\312\003\303J\006\227\027\205\221\371\266\354\334\200\255]\2047DP\225\200\307\275D\320\362\002\177\021\252\215\030\255\264\247\005T\347\230\034\326\204\245\305\"\210\n\261\000\037\246\034\356$\037\242\210Z\034[v\262\331I\003\024:Y2\336c-\024\030\210\264#&\014'\036\250\342ej\331\225w'T\231\352\271\221\215 D\332\025\264\202\366\227\r\262\t'\200\025\322\211`\200\252\313j\361\017\r\002\204\341\025\312\353_\241Y\005A2V\n\223\307;w\001\352\0313(.\374aKaV\234\234Hf\270\253\325hQ\031[{\nT%4`@$P\310P\213\306,\263\241Plp\226\255K\237E6\334\034Q6N\203\255,uw\034\360\037]\365\3275\003\310JB\024\021\007\024\227\245U\337\005\264\036CT\022AU\001\325M\"\006/\353|\254\221\324\024I\"X\253\210\223-*\245\331\215izR\004\252\366F\261\231\307\030\214h\266\n\353_B\313T\024\251U6\036\211\200\256Oz\005\265\224i\033LL\255X\036\024\261tX\3122P\235\322\236\312\251U\"\263L*\317P\026\31236d!\254\014\332\002\006\013\271\330m\333e\372Q\271\027'Q<\220H\027`^c\365\027\364\370Z\003\316\366x\216]y\244\200\264+X\200\340E$\270\202\016\344\014\004\335F\004$\004\261cF\271\031\324\006\304\026`.W\272\365\344\271K^\301U\226\2153\020!\233\\\220K\340J\013\205\370\005\227@I\215R\213\263\242Ff\000\0141\305\240\340\366\272\316A\2144D#\256\224\211MY\311^\2620\004y\200H\n\335\311\200\300\325\327Rs\235A\221\310x\270\225\330\327\217\026#vV\321\262I\335\304\323\227\242QT\364H\005\013\000\254\276\305\354ZX\004\022\032\t\021\276\201\0063K\206k\353\230\231\244\363\002\314\230\3255\326\305\\\344\221\263\004\030;N\267p\200\020BNH\300\362\230J\261\215(m\220\200M\002a\347\t\320\0234\010\251\020X\205m%\260\210\031\223\\/>\340\203\242!\000d\017T\242x&(\357\312/\030Z\205t\204/6\220\037B\302\245\216\021\036\320\034\320\007\304dE\240\221nF\302,\003\201\213)C\241\245b``\332un.\205\211\240E\021I3\n\264\005\201\265\254 :&R\324\306\204\216\363\315\353c%\022 6\346,""\021\032W\340\030\013+'+h\274\305\340F\242\2058\244\005\224X*+\263R\360+\345\270j\000\267s/\036Y\341 /\200\224\320\332\034\345r.KX\230\3147\306<\355\276$d\032\365\240\234\200\310\026\206\215\005\333\362\027\3413\r\235\004\010cb\372\250\027\037\014%0\326\232P\262b-\252:\360\337\236\250=#j\247\026dl\230\\\306\242K|\264\326\342\201m0s\245\340\214\030\205\2013#\343\003\303\277(\261,\220\250e\033\\\037\205\030\024\240l\247H\344\222\271ju\222\366\360a+\342\304\225&\225P\320\023\325q\342\246\211\027@\"x\330b\312\301\264\220y\031\212\20055K\242(`\3250\251\020#8>G\020V\231z\3319p$\232)\346PS\321\322\233\016Pe\320+\031\025\376\344\006\030\231R5%l9\227u\266Z\245m\024\211\311\307ent\000\314AV\020\367<\303\351\226\024\322\246\033\n\210\202B\214O\205\333\344\210\347\226\246\342\026\245p\326\230\001r\240\262\216\240eN\r\236\304\365y\030\ny\343*\010\020P\n\006-\r\251\246\266\243\002\325\230\\\010\216ed\337:\250\307\350\027\303<\265h:\301\3410\374M\177\220\340M\2660\343\340\002\001\005@,\024\007] \316\260Z\347\001\010-\030\001^\356\030\033\007\2641\273~\302pJ\026\2148\303\023\357x\326\260E\305\352\305O\314\2114\023\010\2634\254\377\220\366~\3672R\227\301\177jf;\375*y\001\003\0306[\245\230_\260SPg\200\246L\226\021\021\242\n\234\221r\263r\265Pd\222\031\2624\322$\r\242\030(\313\355\360\345\335_\255\340\212*q\334\336\251\277U\217\355V\252e\246\034\214R\"\215[\301\246G,\232\026E\r]$jG\241k\2621E\257i{q3 \266\343p\326\327\204&\353\367\2049\3306(f\223\002\007V\256y[B\005\276\246\204\272D\317\346\277\243>\0343\300\033\314\327\325\310\261\2340\3163r\356o\334gsqFR\337\020\222\ny\251\032\237\327\0054G6\004\306\231\252\014{\336\324\016\200q\261\3134\315\204\002\324\3034z\302\303\215\312\nD\315uUd\353\027rE8P\220\254\206\0104";
+    PyObject *data = __Pyx_DecompressString(cstring, 2039, 2);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (1868 bytes) */
-const char* const cstring = "x\332\205V\315s\333\306\0257\033\311QlzLZ\262l7\376X\305\037J\323\210,mE\321d\352v\030\212Je}\322\222\342(\235tg\t,\311\215@\000\334]\220\202[wr\324\021G\034q\304\221G\034u\324\221G\034\365'\344O\310[\000\214\324\310\231r\310\345r\337\333\367\336\357\367>\300*g\324@\324\324\270kKf\231\350\220\272\002\031\026\321\251\216Z\334\352\202\254\317\270ev\251)Q\237pF\232\006-\325,\307\320\221iI4\340LRd\322\201\272\211\244\205\266w\321:u93\333_\241\247\242\006b\246\021\003\t\2529\260w\0213\341\204\030\354-I\374\265\0103\034N\225\356\n;\370\313\372^u\361`o\263\377\312=X\332\334\253>\337v\277m\275j\274|Y\377\237\010\221p4\215\n\321r\014\303E\234J@\321\037\007\014\001$\316(\022\322\342\244MK\253\340\003\244\020\234N\0233\000\304p\300\347\236uHM\304\004\004\005'LG\026O\314w\231\350\022\251u.\334\344\224\200}b\030M\242\035&J-\020\251\260W\307\207]\242u\230I\027\232\226c\352\211\030ipM\202\001\"\321\374S1_\372\206\232\224''c\306\010\250\n\322O\235\\\016}\375m\325|\305\016\226\326\335\315\356\272\273,\025\027\033L\310\177\n\311\177\330\310\322\364\376\000\3061\226\266,\310\220\354@\0145Wv\254\004\260N\r\326LB\001\002\301\026\323$\345J\311D;\365\235\205\305\345\305$2N\177\244\232\024\300wS3\210\020T \253\205\232\0163$3\221tm*Jh\255\205\\\313\001D)\010\033\364.^\220\035\340XP\2516h\236\230P5I\3521\\\207*\231G:\343\340\204\365\251\272\rl\nZ\002\"vS\"\262ZB\216I\372\220\014U}\237'\210\325\241B\255Rp\355\223\257>/\375\235\350:\006\343TgB\251QS\255e*\265\362\230\030\246\2675fq\332F\013\\\257\240\005\r\255m\357\030D\266,\336\255\037\331\224\313\025\332g\032E\377AmN\355\013\322\375\375\265\025&R\223z\331\346\226V\326l\207\231-\013\366\002nZe\242Z\251|\336J%\333\025\n\251V.%\242\022$da\234\253\262pE9a\250\254wY\231%6uG\223\330q\230>\3502\ri\";Bm O\035Wk\265\355\375\255=\274U\335\254W_\257\3257p}\253\366\372`gom{\013\257\327\017\316\233d\223\230P=\374\322A\tc\325\177\030\277G\242\262\252\277\347\\\r\203\3379.\375\325\260\240\271\305\337Jm(\354#\373=\016\263\216\273,\310\210\272,\340\252>(""\3464\323X\245\334\244r-\355\320\244cU\003l:P\202\251h\3132\351vb\202\030;Dv0\336q\217\340\263\002E\215\267\350\221|M[\273\365\327\337\256\325\352\tu\273\024\246\230\2011\244\002\303+\253H\n;\341\232P\037%\315\342\226\003\005NE\263\271\264\010\010,\2356\211\240K\213)IZ\207j\207\030Tl\007\206D\327\3225fw\240x\300\025\306IR1\244\014\346bW\375\004;@:\226\234hT\245^3,h\362\256\236\325\217\226M\310\004\253\325\346\304\356\270\245V\002L'|\300\314\324\177\266\342\246+\251\310H\305X\2674\214\025Q \313\350:/@\334M\031\245\246\323MZ\035F9\206\021\236Mt\3129\264\302\021p\211\201T\365-\306\325\211\241T\261\255\250L\003IW\201q\3131\301a;\233bJ-K<\340\205\367\206\325\006\177\260\301j\010\014,\256\253=\267\232\0168\311\232\0203uhB\300L\301\037\027$3%f\002\377J\275bO\034\202\003\025J\002\3720\235\004\352\001\225p\252\n\320H\034\252\025$c\007\202\030`\260K\200txu\251$iNp\367\020F\r|AW\031\220n\223t\317W:\300\277z\032\377\200\271\010\340\244\325l9BSS;\025[\"M\275m+.e\272\nE\227\372\300\\\265\r\360\255\252\301\316\246\207m\331\266%\330\021\3066\214\025\320W\233tld\263\341B\326p\317!F\032\025'\003\014\331R\317\236\324u\262S\226\341\231\347p\363\267\255\"4N\272jBa\250[A\215\026L,\035c\030\276\031Lq!5\260\327i\213@\037\211\0165\014a\033L\246\003\013(\353X\272z\004\201%\305\267\344\352\021a\303PW\223\017\036\2740\2750\304\001Y\305\262\303\255\201Tm\231\316s\354\230\3430.l/M\n5\317\222\247p\262\210\001\341&\\\206r\177\361<\371K\221\342\035M<\030=\370b\370]\3248\233\232\013n\005\313\341b\330\033\346\342\251\353\307\2258\377\320'~/\270\032h\341L\270?\234\217f\243\336\311\344\311\356i\356t\366\264\027\347oyO\275\236\237\213\363\323\336\2427P\272?_\275\362\321\2658\377i\370a\370.\252F\377:\005#7\217{qa\326\243~%\236\271}V\270\343I\377\313`.\250\004\325x\352\346\361;\277\252\014}\352\317\215>\336:%q\376\236_TVf\275=\277\350\317\305S\017G\017_\014\237\017\337D\3253\010j\361x\340\201\322\215\270\360Y\370$<\214\212g\205\307\301\027a.\236\275\003\267\212w\274\216\n#\276\340e-|3\374z\330\212\252*""\314\227AN\305\322\362\253\243\007\365\223\206r\204\374~\360\303\020\034}\354\277\204\260\307\020\022\335\340a\370\337\250q\016\364<\336g~nto\365\204d\332\005\357C\257\3577\374N\320\n\327\206p\343\221\357\000\276[\323 \277Q\364\362~\325o\234\001\023\334\233\365\004\240*$\026\374Y\277w6\006\277\016\\\235\333\377\223_\031\335\3378\005\3147\217\245\367\245?\347W \346\211?\207\313CP\273\347\317\370\337\005\215\200\304\211xY\t\177\252\306\267\037\007 D\200\021,\314y\025\357\033\177)\370cX\tk\341\333h:Z\201\3345\224\301\177+s?\201\355\242WT\270+1`\230\312\217\362O\202\225\360jHB7\312Aa(\027\361\324Giz\217\374\243\240\027N\002\231\265\341 \"\361\315BF\203_\204t\20072\272\362\010\340LL\252\332yq\374\243\377\001\330Uq\304\371\333\336\367\376\273\260\n%\364,\232\214\336\234$\251XR\350\203I@\321T>\343\033\005\357\232\377\330o\374\377;\023\301\327\351\235\224\334)HL\241\230\276\317\n3\336J\022Sa:\301\0175w\307{\033LC2\356\336\367\377\021T\203\357C>\234\035\366\242\\|\377\221\357\206\037\204\225\030\315\0072\\\032\026\207O\206\315\350\017\321\263\223\334\331]\300\022\\\013?\tW\2414\256\347\177\236\2722\231\007T$e{41\027\334\r\213c\366\227\2632K\230Q48A=|\024\345\316&f\274U\3773p\332\210'\256\037\077\077\336\367\236x\344\027'\355\261\360";
-    PyObject *data = __Pyx_DecompressString(cstring, 1868, 1);
+    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (1878 bytes) */
+const char* const cstring = "x\332uV\317W\033G\022\016\033p\210-?K\006\203\275\376\301\020\343\220\315\006ie+\204\315[\357>E\210\254\314o\003I\310\276l\277\326L\017\3520\232\031u\367H\214\367y_\216\034\3478\3079\316QG\0359r\324q\216\374\t\371\023\266\272gdH\360\352\301\320\352\256\256\372\352\253\257j\2502J,\215\330:\363]A\035[;&>\327,\007\033\304\320L\346\264\341\254K\231c\267\211-\264.f\0247-R\2549\236eh\266#\264\036\243\202h6\351\311\233\232p\264\355=m\235\370\214\332G_k\317x\r\216\251\216-\215\023\335\203\265\257Q\033v\260E\337`\025\317\304\324\362\030\221\266\253\364\360/\353\373\325\312\341\376f\367\225\177\270\274\271_}\276\355\177g\276\332}\371\262\376\033\204\032\367t\235pnz\226\345k\214\010\310\242;\002\014\000T0\242q\3410|D\212k\020\003N\001\234A\224\033H\304\362 \346\276sLl\215r\000\005;\324\320\034\246\334\267)oc\241\267\256\334d\004\203\177lYM\254\037+#\023\216$\354\265\321f\033\353-j\223\245\246\343\331\206:\326t\270&\300\001\026\332\3423\276X\374\226\330\204\251\235\021c\030L9\356\246A\256C_\177S\265_\321\303\345u\177\263\275\356\257\010\311\305\006\345\342_\\\260\2376\2622\275\037\300\010cq\313\201\n\211\026`\250\371\242\345\250\204\rb\321\246\202\002\004\202/\252\013\302\244\221\255\355\324w\226*+\025\205\214\221\237\211.8\360\335\324-\3149\341\232cjM\217Z\202\332\232\360]\302\213Z\303\324|\307\203\214\322$\\\260\273zA\264\200cN\204\\h\213\330\006\325\250\322#\270\016*Y\324\014\312 \010\355\022y\033\330\344\244\010D\354\245DdZ\322<\033w\241\030R}_\250\214\345\246\314Z\226\340\346'_\177Q\374\0076\014\004\316\311\222nP.\r\211-\237%\"\364\322\210\032j\034\351\224\247\007F\311e\216^\322]\217\332\246\003k\356\022\346\224\260l\211\322eK\024]\177\211\031e.Q\353\245\242:.\002\271K#\336K\334\347%\225m\311h\323\022U~\rO\027\310\363\250Q\255\325\266\017\266\366\321Vu\263^}\335\250o\240\372V\355\365\341\316~c{\013\255\327\017/\225\275\211m(9\273\266QDH6\rB\3579\221\2450\336\263/;\370\377l\027\377f9\320\221\374\357\305#P\343\211\373\236\200Y\233\\?\310X\271~\300dQ\tb$\263X#\314&\242\261""\275caa:\254]?\001n\305*\351R\235\\\356\036\0344V\033i\353\251V\224\312\336\364@[\351\365-\307&\333*\014\266v\260h!\264\343\237\300\357*\250\025m\221\023\361\232\230{\365\327\3375juE\357\036\201\361d!\004uA\360\311\244F`\305}[\247NQw\230\343\201r\to6\227+\220\245c\220&\346d\271\222\022\251\267\210~\214\300\304\365\240\373\333\216\241S\267\005\270!\024B\252\302\350\210\010\030xm\371\025\374@a\220`X'R\007\272\345@\367\266\215LPz6\372\024\037\316\021\303n\313/\232*1\235g\n10\353Q;\005\222=Q\323\027\204g\025@\310pt\204$\253p\226q{)M\324N\351'\266\327V\315\014\303\032\301\220\316f6a\314a\344\004HE\300\256\374\313G\232E `\344JNSD\351\223#dz6\004<\312\346\2244\313T\002\211\303\317\206s\004\361`\201d\233\367\034f\3105s\232\036\004\311\232\014Q\271i\003`*y\030\251\227\332\000\231\221#D9zW\010\311%?\206(\022\217\312\3748mx\371\036R\014K\311Z*\252|\302\311(\n\307\026xmc(\001|\332D\340\264B\250}\014\023\005\376\000\303\026\024\337\306\355\313'\351\241w\221F_`\374A\206\302i\232\036\327\345pN\217\035\236\n\301u%\241\"}r\311\231\374\205\361\351Z\020[j\303\315\344\354:\256\353pz\202\220\313\210\264\227\213t\252dc\343J\351P\307\303V\212\212\341\036\202\222\311WL\032Z\255\244gx\265y\314\376}sq\235\341\266\034`\010T\314\211e\302@3\020\202\031\233\245\311\257\324\007\326\00611t\025w-*\3221\006l\265\034C\276d\300\211\244Z0\371\022pal\313\231\010\257V\230i\010 @U\221h1\247'd\177\246\023\033y\366\010\301\225\345\265\261\"\207\237z\317\252\007\357af\303e\220\373\213\347\2756\325\325?\016i\272\303\361\307\303\307_\366\177\030\354&\223\363\321\335h%\256\304\235\376X2y\353\264\234\344\236\2048\354D7\"=\236\216\017\372\213\203\231A\347l\342l\357|\354|\346\274\223\344\356\006\317\202N8\226\344\246\202J\320\223\266\027\223\037'\271\317\342\217\342\267\203\352\340\337\347\340\342\316i'\311\317\004$,'\323\367.\362\263\201\010\277\212\346\243rTM&\357\234\276\r\253\322\315g\341\374\360\341\3269Nr\017\302\302\305\344\275`?,\204\363\311\344\223\341\223\027\375\347\375\357\007\325\013\000T9\355\005`r;""\311\177\036/\304\307\203B\222\177\032}\031\217%3\263\277\336\370\2400\033\264$\204\344J\214F\374}\377\233\2769\250J\210/\2431\211\304\014\253\303\307\365\263\335\213\311\271\260\033\375\324\2070\017\303\227\0009\005\257\354\242'\361\177\201\221w\t^\"\3754\034\033>X;\303\3126\037|\024t\303\335\260\025\231q\243\017\366s\241\007y\335\235\0028\267\013A.\254\206\273\027\300\000\013f\002\016\371\344\325\375p\006x\032%\275\016\034]z\377SX\036>\3328\207l\357\234\212\340\253p>,\003\332\361?\307+}0{\020N\207?D\273\021N\324\361\212<\374\245\232\334{\032\301\241\006\331\201\207\371\240\034|\033.G\177\214\313q-~3\230\032\254B\305v\245\303\377Hw\277\200\357BP\2209\227\223\217o&\223\271an!Z\215o\3048\366\007c \007\031\"I\231\250\004'\341I\324\211'\200\306Z\2777\300\311\235|FBX\200B@4<\374`\0168\037\237\220\212yq\372s\370!\370U8VRR\223\334\275\340\307\360m\\\215\367\373\263\003\245\225e\311@4\001\2314e\334\344v>\270\031>\rw\323{\177\r\377\031\255\305\363\327\356\345\203\311\360FhFU\200\227\237\032N-D\265\250\223L?\014+P\306\335\310\210?\211\277\211\315~\365BYB\251\013\351\317E~:XU\200\363S\212\034\020\342l\360&\232\202J\335\177\004\301\252\321\2171\353\317\364;\020\345\321\\\350\307\037\306\345D[\214D\274\334/\364\027\372\315\301\037\006\237\236\215]\334\207D\243\233\020f\r4s+\0075\236\310A\3128-\305p|>\272\037\027F\245Y\311\324\247h\223\034yQ=\236\203\010\343\323\301Z\370\271\312b\374\326\351\363\323\203`!\300\377\003\017=\265 ";
+    PyObject *data = __Pyx_DecompressString(cstring, 1878, 1);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #else /* compression: none (3090 bytes) */
-const char* const bytes = "Ariel encryption keys loaded from environment variable.Could not write new key to OS Keyring: %sCritical security initialization failure: %sDiY0KTA4YTMvJyY6MTA2OyVfJQ==Encryption key successfully retrieved from OS secure storage.Failed to decrypt value: Token is invalid or key mismatch.Failed to read fallback key file: %sFallback machine-bound file created at '%s'.Generated new key and saved to OS secure storage.KzAnJiY6KyMmKy8tJQ==List[str]Loaded fallback machine-bound key file.Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.OS Secure Keyring unavailable, falling back: %s\n\":,.?add_notedisableenable/etc/machine-idgcioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUIDisenabled/proc/cpuinfoprospero/ariel/encryption.pystatic/.ariel.key-fallback/sys/class/dmi/id/product_uuidwmic csproduct get uuidACCOUNT_NAMEARIEL_ENCRYPTION_KEYEncryptionManagerEncryptionManager.__init__EncryptionManager._buildEncryptionManager._loadEncryptionManager._load.<locals>.genexprEncryptionManager.decryptEncryptionManager.encryptEncryptionManager.rotate_reencryptFernetInvalidTokenListMultiFernetNoneOptionalPath__Pyx_PyDict_NextRefSERVICE_NAMESerial__all____annotate__asyncio.coroutinesbb64decodebase64_buildcheck_outputchmodciphertext__class_getitem__cline_in_tracebackclosecmdcpuinfocriticalcryptography.fernetdarwindecodedecoded_bytesdecrypt__doc__eencodeencryptencryption_managerenumerateenv_varenvironerrorexist_okexistsfallback_key_path_fernetfernets__func__generate_keygenexprgetgetLoggerget_passwordget_robust_machine_idgetnodeiinfo__init__int_is_coroutineitemskkeykey_byteskeyringkeysline_loadloggerloggingmachine_salt__main____metaclass__mkdir__module__name__name__new_key_bytesnew_key_strnextobfuscated_bytesosoutputpparentparentspathpathlibplaintextplatformpopposix__prepare__prospero.ariel.encryption__qualname__raw_envread_bytesread_textreturnrotate_reencrypt""scrambled_b64selfsend__set_name__set_passwordsetdefaultshellsplitstaticmethodstored_keystrstripsubprocesssys__test__throwtokentyping_unscramble_unscramble.<locals>.genexpruuidvaluevalueswarningwin32write_bytes\320\004\035\320\0355\260X\270Q\340\010!\240\022\2408\2504\250q\260\001\330\010\013\2101\330\014\036\230a\230q\240\006\240c\250\024\250U\260'\270\026\270q\300\005\300S\310\001\310\026\310q\330\014\022\220%\220q\230\001\330\014\023\2204\220w\230a\230q\360\006\000\t\n\330\014(\250\007\250}\270A\270^\3101\330\014\017\210q\330\020\026\220e\2301\330\024\025\340\020\027\220t\2307\240!\2401\240A\330\010\017\210}\230A\330\014\022\220(\230!\320\033N\310a\330\014\031\230\021\360\006\000\t\026\220T\230\021\230!\330\010\036\320\0363\2602\260W\270A\340\010\013\2104\210w\220a\330\014\r\330\020*\250$\250k\270\021\340\020#\2405\250\001\330\026\027\360\006\000\021\027\220h\230a\230q\330\020\027\220t\2307\240!\2401\240I\250W\260B\260f\270A\330\014\023\220=\240\001\330\020\026\220f\230A\320\035E\300Q\360\006\000\t \230v\240]\260!\330\010\033\230=\250\007\250q\360\006\000\t\n\330\014\023\220=\240\001\240\036\250~\270Q\330\014\022\220%\220q\230\001\330\010\017\210}\230A\330\014\022\220&\230\001\320\031F\300a\360\006\000\t\n\330\014\020\220\007\220v\230Q\230h\240f\250I\260Q\330\014\037\230u\240A\330\022\023\360\006\000\r\021\220\014\230A\230Q\340\014\017\210r\220\026\220s\230!\330\020\022\220&\230\001\230\026\230q\340\014\022\220(\230!\320\033K\3101\330\010\017\210}\230A\330\014\022\220)\2301\320\034L\310A\340\010\017\210t\2207\230!\2301\230A\320\004+\2508\2601\330\010\031\230\024\230X\240Q\240a\330\010\017\210t\2208\2301\230A\200A\330\025#\2401\330\010 \240\001\330\014\022\220!\2201\220G\2306\240\032\2501\250C\250z\270\023\270D\300\005\300Q\340\010\017\210{\230!\2301\200A\340\010\021\220\021\330\010\033\2301\330\t\n\330\010\014\320\014$\240D\250\006\250a\250y\270\001\320\004\035\230X\240Q\330\010\t\330\014\023\2204\220x\230x\240q\250\005\250W\260C\260w\270a\330\017\020\330\014\022""\220&\230\001\230\021\330\014\r\220!\220a\320\000\037\230q\340\004\005\330\010\013\2103\210j\230\003\2301\330\014\022\220!\330\014\025\220Z\230}\250A\250U\260&\270\005\270W\300A\330\014\023\2206\230\026\230q\240\005\240Q\240b\250\006\250a\330\r\020\220\n\230#\230Q\330\014\022\220!\330\014\025\220Z\230}\250A\250U\260&\270\005\270W\300A\330\014\023\2206\230\026\230q\240\004\240B\240b\250\006\250a\360\006\000\r\021\220\010\230\001\330\020\021\330\020\021\330\020\021\340\020\024\220D\230\001\230\021\330\020\023\2201\220G\2301\330\024\027\220z\240\023\240A\330\030\034\230H\240A\240Z\250r\260\026\260q\270\001\330\034\037\230y\250\003\2501\330 '\240t\2506\260\021\260$\260b\270\002\270&\300\001\340\030\037\230q\240\n\250\"\250F\260!\330\013\014\360\010\000\005\014\2103\210a\210t\2208\2301\320\004!\240\030\250\021\330\010\017\210t\2208\2308\2401\240I\250W\260C\260w\270a\320\000\037\230u\240E\250\037\270\001\340\004\024\220F\230*\240A\240Q\330\004\013\2102\210U\220$\220a";
+    #else /* compression: none (3083 bytes) */
+const char* const bytes = "Ariel encryption keys loaded from environment variable.Could not write new key to OS Keyring: %sCritical security initialization failure: %sDiY0KTA4YTMvJyY6MTA2OyVfJQ==Encryption key successfully retrieved from OS secure storage.Failed to decrypt value: Token is invalid or key mismatch.Failed to read fallback key file: %sFallback machine-bound file created at '%s'.Generated new key and saved to OS secure storage.KzAnJiY6KyMmKy8tJQ==List[str]Loaded fallback machine-bound key file.Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.OS Secure Keyring unavailable, falling back: %s\n\":,.?add_note-cdisableenable/etc/machine-idgcisenabled/proc/cpuinfoprospero/ariel/encryption.py-rd1static/.ariel.key-fallback/sys/class/dmi/id/product_uuidACCOUNT_NAMEARIEL_ENCRYPTION_KEYEncryptionManagerEncryptionManager.__init__EncryptionManager._buildEncryptionManager._loadEncryptionManager._load.<locals>.genexprEncryptionManager.decryptEncryptionManager.encryptEncryptionManager.rotate_reencryptFernetIOPlatformExpertDeviceIOPlatformUUIDInvalidTokenListMultiFernetNoneOptionalPath__Pyx_PyDict_NextRefSERVICE_NAMESerial__all____annotate__asyncio.coroutinesbb64decodebase64_buildcheck_outputchmodciphertext__class_getitem__cline_in_tracebackclosecmdcpuinfocriticalcryptography.fernetcsproductdarwindecodedecoded_bytesdecrypt__doc__eencodeencryptencryption_managerenumerateenv_varenvironerrorexist_okexistsfallback_key_path_fernetfernets__func__generate_keygenexprgetgetLoggerget_passwordget_robust_machine_idgetnodeiinfo__init__intioreg_is_coroutineitemskkeykey_byteskeyringkeysline_loadloggerloggingmachine_salt__main____metaclass__mkdir__module__name__name__new_key_bytesnew_key_strnextobfuscated_bytesosoutputpparentparentspathpathlibplaintextplatformpopposix__prepare__prospero.ariel.encryption__qualname__raw_envread_bytesread_textreturnrotate_reencryptscrambled_b64selfsend__se""t_name__set_passwordsetdefaultsplitstaticmethodstored_keystrstripsubprocesssys__test__throwtokentyping_unscramble_unscramble.<locals>.genexpruuidvaluevalueswarningwin32wmicwrite_bytes\320\004\035\320\0355\260X\270Q\330\010!\240\022\2408\2504\250q\260\001\330\010\013\2101\330\014\036\230a\230q\240\006\240c\250\024\250U\260'\270\026\270q\300\005\300S\310\001\310\026\310q\330\014\022\220%\220q\230\001\330\014\023\2204\220w\230a\230q\340\010\t\330\014(\250\007\250}\270A\270^\3101\330\014\017\210q\330\020\026\220e\2301\330\024\025\340\020\027\220t\2307\240!\2401\240A\330\010\017\210}\230A\330\014\022\220(\230!\320\033N\310a\330\014\031\230\021\340\010\025\220T\230\021\230!\330\010\036\320\0363\2602\260W\270A\340\010\013\2104\210w\220a\330\014\r\330\020*\250$\250k\270\021\330\020#\2405\250\001\330\026\027\360\006\000\021\027\220h\230a\230q\330\020\027\220t\2307\240!\2401\240I\250W\260B\260f\270A\330\014\023\220=\240\001\330\020\026\220f\230A\320\035E\300Q\340\010\037\230v\240]\260!\330\010\033\230=\250\007\250q\340\010\t\330\014\023\220=\240\001\240\036\250~\270Q\330\014\022\220%\220q\230\001\330\010\017\210}\230A\330\014\022\220&\230\001\320\031F\300a\340\010\t\330\014\020\220\007\220v\230Q\230h\240f\250I\260Q\330\014\037\230u\240A\330\022\023\360\006\000\r\021\220\014\230A\230Q\340\014\017\210r\220\026\220s\230!\330\020\022\220&\230\001\230\026\230q\340\014\022\220(\230!\320\033K\3101\330\010\017\210}\230A\330\014\022\220)\2301\320\034L\310A\340\010\017\210t\2207\230!\2301\230A\320\004+\2508\2601\330\010\031\230\024\230X\240Q\240a\330\010\017\210t\2208\2301\230A\200A\330\025#\2401\330\010 \240\001\330\014\022\220!\2201\220G\2306\240\032\2501\250C\250z\270\023\270D\300\005\300Q\340\010\017\210{\230!\2301\200A\340\010\021\220\021\330\010\033\2301\330\t\n\330\010\014\320\014$\240D\250\006\250a\250y\270\001\320\004\035\230X\240Q\330\010\t\330\014\023\2204\220x\230x\240q\250\005\250W\260C\260w\270a\330\017\020\330\014\022\220&\230\001\230\021\330\014\r\220!\220a\320\000\037""\230q\330\004\005\330\010\013\2103\210j\230\003\2301\330\014\022\220!\2208\230=\250\007\250q\330\014\025\220Z\230}\250A\250T\260\027\270\001\330\014\023\2206\230\026\230q\240\005\240Q\240b\250\006\250a\330\r\020\220\n\230#\230Q\330\014\022\220!\2209\230H\240F\250!\330\014\025\220Z\230}\250A\250T\260\027\270\001\330\014\020\220\010\230\006\230f\240A\240Q\330\020\023\320\023$\240C\240q\330\024\033\2304\230v\240Q\240d\250\"\250B\250f\260A\340\014\020\220\010\230\001\330\020\021\330\020\021\330\020\021\340\020\024\220D\230\001\230\021\330\020\023\2201\220G\2301\330\024\027\220z\240\023\240A\330\030\034\230H\240A\240Z\250r\260\026\260q\270\001\330\034\037\230y\250\003\2501\330 '\240t\2506\260\021\260$\260b\270\002\270&\300\001\340\030\037\230q\240\n\250\"\250F\260!\330\013\014\360\006\000\005\014\2103\210a\210t\2208\2301\320\004!\240\030\250\021\330\010\017\210t\2208\2308\2401\240I\250W\260C\260w\270a\320\000\037\230u\240E\250\037\270\001\330\004\024\220F\230*\240A\240Q\330\004\013\2102\210U\220$\220a";
     PyObject *data = NULL;
     CYTHON_UNUSED_VAR(__Pyx_DecompressString);
     #endif
     PyObject **stringtab = __pyx_mstate->__pyx_string_tab;
     Py_ssize_t pos = 0;
-    for (int i = 0; i < 167; i++) {
+    for (int i = 0; i < 171; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyUnicode_DecodeUTF8(bytes + pos, bytes_length, NULL);
       if (likely(string) && i >= 33) PyUnicode_InternInPlace(&string);
@@ -9551,7 +9675,7 @@ const char* const bytes = "Ariel encryption keys loaded from environment variabl
       stringtab[i] = string;
       pos += bytes_length;
     }
-    for (int i = 167; i < 177; i++) {
+    for (int i = 171; i < 181; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyBytes_FromStringAndSize(bytes + pos, bytes_length);
       stringtab[i] = string;
@@ -9562,14 +9686,14 @@ const char* const bytes = "Ariel encryption keys loaded from environment variabl
       }
     }
     Py_XDECREF(data);
-    for (Py_ssize_t i = 0; i < 177; i++) {
+    for (Py_ssize_t i = 0; i < 181; i++) {
       if (unlikely(PyObject_Hash(stringtab[i]) == -1)) {
         __PYX_ERR(0, 1, __pyx_L1_error)
       }
     }
     #if CYTHON_IMMORTAL_CONSTANTS
     {
-      PyObject **table = stringtab + 167;
+      PyObject **table = stringtab + 171;
       for (Py_ssize_t i=0; i<10; ++i) {
         #if PY_VERSION_HEX >= 0x030F0000
         PyUnstable_SetImmortal(table[i]);
@@ -9651,17 +9775,17 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 22};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 21};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_b};
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_kp_b_iso88591_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 100};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 93};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_b};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_kp_b_iso88591_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 123};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_GENERATOR), 113};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_i, __pyx_mstate->__pyx_n_u_b};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_kp_b_iso88591__8, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
@@ -9671,37 +9795,37 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_unscramble, __pyx_mstate->__pyx_kp_b_iso88591_uE_F_AQ_2U_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 30};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_cmd, __pyx_mstate->__pyx_n_u_output, __pyx_mstate->__pyx_n_u_path, __pyx_mstate->__pyx_n_u_p, __pyx_mstate->__pyx_n_u_line};
-    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_get_robust_machine_id, __pyx_mstate->__pyx_kp_b_iso88591_q_3j_1_Z_AU_WA_6_q_Qb_a_Q_Z_AU, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 28};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_cmd, __pyx_mstate->__pyx_n_u_output, __pyx_mstate->__pyx_n_u_line, __pyx_mstate->__pyx_n_u_path, __pyx_mstate->__pyx_n_u_p};
+    __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_get_robust_machine_id, __pyx_mstate->__pyx_kp_b_iso88591_q_3j_1_8_q_Z_AT_6_q_Qb_a_Q_9HF, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 64};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 61};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_env_var, __pyx_mstate->__pyx_n_u_fallback_key_path};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_init, __pyx_mstate->__pyx_kp_b_iso88591_A_1_D_ay, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 17, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 71};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 17, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 68};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_env_var, __pyx_mstate->__pyx_n_u_fallback_key_path, __pyx_mstate->__pyx_n_u_raw_env, __pyx_mstate->__pyx_n_u_keys, __pyx_mstate->__pyx_n_u_stored_key, __pyx_mstate->__pyx_n_u_e, __pyx_mstate->__pyx_n_u_path, __pyx_mstate->__pyx_n_u_machine_salt, __pyx_mstate->__pyx_n_u_obfuscated_bytes, __pyx_mstate->__pyx_n_u_key_bytes, __pyx_mstate->__pyx_n_u_new_key_bytes, __pyx_mstate->__pyx_n_u_new_key_str, __pyx_mstate->__pyx_n_u_k, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_n_u_genexpr, __pyx_mstate->__pyx_n_u_genexpr};
     __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_load, __pyx_mstate->__pyx_kp_b_iso88591_5XQ_84q_1_aq_c_U_q_S_q_q_4waq_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 137};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 127};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_keys, __pyx_mstate->__pyx_n_u_fernets, __pyx_mstate->__pyx_n_u_k};
     __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_build, __pyx_mstate->__pyx_kp_b_iso88591_A_1_1G6_1Cz_D_Q_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 144};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 134};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_plaintext};
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_encrypt, __pyx_mstate->__pyx_kp_b_iso88591_t881IWCwa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 147};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 137};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_token};
     __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_decrypt, __pyx_mstate->__pyx_kp_b_iso88591_XQ_4xxq_WCwa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 154};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 144};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_ciphertext, __pyx_mstate->__pyx_n_u_plaintext};
     __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_prospero_ariel_encryption_py, __pyx_mstate->__pyx_n_u_rotate_reencrypt, __pyx_mstate->__pyx_kp_b_iso88591_81_XQa_t81A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
@@ -11259,38 +11383,6 @@ static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
     return __Pyx_GetBuiltinName(name);
 }
 
-/* PyObjectVectorCallKwBuilder */
-#if CYTHON_VECTORCALL
-static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_PyObject_FastCallDict;
-    Py_INCREF(key);
-    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
-    args[n] = value;
-    return 0;
-}
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    (void)__Pyx_VectorcallBuilder_AddArgStr;
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
-}
-static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
-    PyObject *pyKey = PyUnicode_FromString(key);
-    if (!pyKey) return -1;
-    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
-}
-#else // CYTHON_VECTORCALL
-CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
-    if (unlikely(!PyUnicode_Check(key))) {
-        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
-        return -1;
-    }
-    return PyDict_SetItem(builder, key, value);
-}
-#endif
-
 /* PyObjectFastCallMethod */
 #if !CYTHON_VECTORCALL || PY_VERSION_HEX < 0x03090000
 static PyObject *__Pyx_PyObject_FastCallMethod(PyObject *name, PyObject *const *args, size_t nargsf) {
@@ -11777,6 +11869,38 @@ static CYTHON_INLINE PyObject* __Pyx_decode_c_bytes(
         return PyUnicode_Decode(cstring, length, encoding, errors);
     }
 }
+
+/* PyObjectVectorCallKwBuilder (used by PyObjectVectorCallMethodKwBuilder) */
+#if CYTHON_VECTORCALL
+static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_PyObject_FastCallDict;
+    Py_INCREF(key);
+    if (__Pyx_PyTuple_SET_ITEM(builder, n, key) != (0)) return -1;
+    args[n] = value;
+    return 0;
+}
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    (void)__Pyx_VectorcallBuilder_AddArgStr;
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n);
+}
+static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
+    PyObject *pyKey = PyUnicode_FromString(key);
+    if (!pyKey) return -1;
+    return __Pyx_VectorcallBuilder_AddArg(pyKey, value, builder, args, n);
+}
+#else // CYTHON_VECTORCALL
+CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, CYTHON_UNUSED PyObject **args, CYTHON_UNUSED int n) {
+    if (unlikely(!PyUnicode_Check(key))) {
+        PyErr_SetString(PyExc_TypeError, "keywords must be strings");
+        return -1;
+    }
+    return PyDict_SetItem(builder, key, value);
+}
+#endif
 
 /* PyObjectVectorCallMethodKwBuilder */
 #if !CYTHON_VECTORCALL || PY_VERSION_HEX < 0x03090000
