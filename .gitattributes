@@ -1,0 +1,20 @@
+# Language Detection overrides
+*.js linguist-detectable=true
+*.c linguist-detectable=true
+*.py linguist-detectable=true
+
+# Global text normalization
+* text=auto
+
+# Explicit Line Endings
+*.py text eol=lf
+*.js text eol=lf
+*.c text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Git Archive Exclusions
+.github/** export-ignore
+tests/** export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
