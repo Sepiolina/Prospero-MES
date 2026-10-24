@@ -27,7 +27,7 @@ defusedxml==0.7.1
 docutils==0.23
 dparse==0.6.4
 fastapi==0.139.0
-filelock==3.29.7
+filelock==4.2.1
 frozenlist==1.8.0
 greenlet==3.5.3
 h11==0.16.0
