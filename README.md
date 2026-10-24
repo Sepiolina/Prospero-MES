@@ -50,3 +50,7 @@ Prospero-MES/
 python main.py
 ```
 
+
+## Desktop migration milestone
+
+The separate Tauri 2 + React + TypeScript station editor is in [`desktop/`](desktop/README.md). It provides local layout/workflow editing and simulation; the Python application remains the existing runtime.
