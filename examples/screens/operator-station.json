@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "name": "Operator station",
+  "root": {
+    "id": "74003848ad71445c82e46de458d70b38",
+    "kind": "column",
+    "name": "Screen",
+    "props": {
+      "gap": 16,
+      "padding": 16,
+      "columns": 2,
+      "align": "stretch"
+    },
+    "children": [
+      {
+        "id": "3e245f48d94d4d1bb4cae2406aa5fd0c",
+        "kind": "text",
+        "name": "Station title",
+        "props": {
+          "text": "Production station",
+          "variant": "h1"
+        },
+        "children": []
+      },
+      {
+        "id": "e5eebbbc65934639a9afe0a7f89f4b0e",
+        "kind": "text",
+        "name": "",
+        "props": {
+          "text": "Scan a serial number to begin a new cycle.",
+          "variant": "normal"
+        },
+        "children": []
+      },
+      {
+        "id": "340eb669072e4e739624e76c9eacfee1",
+        "kind": "card",
+        "name": "Cycle details",
+        "props": {
+          "gap": 16,
+          "padding": 16,
+          "columns": 2,
+          "align": "stretch"
+        },
+        "children": [
+          {
+            "id": "070e3440e6544804b77bdf73d163b9c4",
+            "kind": "text",
+            "name": "",
+            "props": {
+              "text": "Cycle details",
+              "variant": "h3"
+            },
+            "children": []
+          },
+          {
+            "id": "3e8bd020bbb64fc2b50f7321e8f9bd10",
+            "kind": "grid",
+            "name": "Station fields",
+            "props": {
+              "gap": 16,
+              "padding": 16,
+              "columns": 2,
+              "align": "stretch"
+            },
+            "children": [
+              {
+                "id": "46fc0bf92a0d44fdb601b9adf5fd57df",
+                "kind": "input",
+                "name": "",
+                "props": {
+                  "label": "Serial number",
+                  "placeholder": "Scan or enter a value",
+                  "required": false
+                },
+                "children": []
+              },
+              {
+                "id": "0c87192ca8a04e60b5c9e76e27335688",
+                "kind": "select",
+                "name": "",
+                "props": {
+                  "label": "Production line",
+                  "options": [
+                    "Line 1",
+                    "Line 2"
+                  ],
+                  "required": false
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "262da21e99914412838ca706a08a9002",
+            "kind": "button",
+            "name": "",
+            "props": {
+              "text": "Start cycle",
+              "type": "primary",
+              "action": ""
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "cc37a84c440e4727a9ac8b24eea49ba0",
+        "kind": "table",
+        "name": "",
+        "props": {
+          "title": "Recent results",
+          "columns": [
+            "Serial",
+            "Result",
+            "Time"
+          ]
+        },
+        "children": []
+      }
+    ]
+  }
+}
