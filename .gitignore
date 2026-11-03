@@ -222,3 +222,7 @@ __marimo__/
 
 # Database File
 *.db
+
+# Local authoring and test artifacts
+/work/
+static/.ariel.key-fallback

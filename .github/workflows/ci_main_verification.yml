@@ -34,8 +34,10 @@ jobs:
 
       - name: Install analysis tooling
         shell: bash
-        # Match the reviewed analysis-tool versions already pinned in requirements.txt.
-        run: python -m pip install --upgrade --constraint requirements.txt pip ruff bandit pip-audit
+        run: |
+          python -m pip install --upgrade pip bandit pip-audit
+          # Use the same Ruff version as local development.
+          python -m pip install --upgrade --constraint requirements.txt ruff
         
       - name: Lint (ruff)
         shell: bash
