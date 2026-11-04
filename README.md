@@ -12,8 +12,9 @@ Prospero-MES is a Python-based Manufacturing Execution System.
 - Client & Database Integration
 - Key-Value Storage
 - Logging Capability
-- Visual screen editor with drag-and-drop Prospero components, nested layouts,
-  property editing, undo/redo, and JSON import/export
+- Visual screen editor with matching edit/preview rendering, drag-and-drop
+  components, live appearance controls, responsive layouts, undo/redo, and JSON
+  import/export
 
 ## Visual screen editor
 
@@ -22,8 +23,10 @@ python -m prospero.builder
 ```
 
 Open **http://127.0.0.1:8081** to build a station screen using ready-made components.
-See the [Screen Studio guide](docs/screen-builder.md) for editing, saving, and
-connecting exported screens to Python station logic.
+Design and preview share the same renderer, with exact viewport widths and zoom,
+live layout and appearance editing, keyboard shortcuts, and browser recovery.
+See the [Screen Studio guide](docs/screen-builder.md) for saving screens and
+connecting them to Python station logic.
 
 ## Project Structure
 

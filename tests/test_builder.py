@@ -1,14 +1,17 @@
 """Screen persistence, tree invariants, editing transactions, and runtime integration."""
 
 import json
+from pathlib import Path
 
 import pytest
 
 from prospero.builder.schema import (
+    Appearance,
     MAX_DOCUMENT_BYTES,
     EditorState,
     Node,
     Screen,
+    ScreenDesign,
     find,
     starter_screen,
     walk,
@@ -35,6 +38,141 @@ def test_round_trip_preserves_ids_and_properties():
     screen = starter_screen()
     assert Screen.from_json(screen.to_json()) == screen
     assert len({n.id for n in walk(screen.root)}) == 10
+
+
+def test_original_screen_files_remain_loadable_without_new_fields():
+    """The committed v1 example predates appearance and document design settings."""
+    path = Path(__file__).parents[1] / "examples/screens/operator-station.json"
+    legacy = json.loads(path.read_text())
+    assert "design" not in legacy
+    expected_ids = []
+
+    def collect_ids(node):
+        expected_ids.append(node["id"])
+        assert "appearance" not in node
+        for child in node["children"]:
+            collect_ids(child)
+
+    collect_ids(legacy["root"])
+    loaded = Screen.from_json(json.dumps(legacy))
+    assert [node.id for node in walk(loaded.root)] == expected_ids
+    assert loaded.design == ScreenDesign()
+    assert all(node.appearance == Appearance() for node in walk(loaded.root))
+    assert Screen.from_json(loaded.to_json()) == loaded
+
+
+@pytest.mark.parametrize(
+    "appearance",
+    [
+        {"width": "fixed", "width_px": 0},
+        {"width_px": "200"},
+        {"padding": -1},
+        {"font_size": 500},
+        {"radius": 100},
+        {"foreground": "url(https://example.com)"},
+        {"style": "position: fixed"},
+    ],
+)
+def test_invalid_appearance_never_changes_document_or_history(appearance):
+    state = EditorState(simple_screen())
+    state.selected_id = "first"
+    before = state.screen.to_json()
+    with pytest.raises(ValueError):
+        state.update_selected("Modified", {"text": "Changed"}, appearance=appearance)
+    assert state.screen.to_json() == before
+    assert not state.undo_stack
+
+
+@pytest.mark.parametrize(
+    "design",
+    [
+        {"accent": "red; background: url(https://example.com)"},
+        {"accent": "#fff"},
+        {"mode": "arbitrary"},
+        {"font": "https://example.com/font.woff"},
+    ],
+)
+def test_document_theme_rejects_unsupported_values(design):
+    data = simple_screen().model_dump()
+    data["design"] = design
+    with pytest.raises(ValueError):
+        Screen.from_json(json.dumps(data))
+
+
+def test_typing_group_is_one_undo_step_and_new_focus_is_a_new_step():
+    state = EditorState(simple_screen())
+    state.selected_id = "first"
+    original = state.screen.to_json()
+    for text in ["S", "St", "Station"]:
+        state.update_selected("Heading", {"text": text}, group="first.text")
+    assert len(state.undo_stack) == 1
+    first_edit = state.screen.to_json()
+    state.end_edit_group()
+    state.update_selected("Heading", {"text": "Station A"}, group="first.text")
+    assert len(state.undo_stack) == 2
+    state.history()
+    assert state.screen.to_json() == first_edit
+    state.history()
+    assert state.screen.to_json() == original
+    state.history(redo=True)
+    assert state.screen.to_json() == first_edit
+
+
+def test_appearance_edit_and_document_theme_survive_export_and_undo():
+    state = EditorState(simple_screen())
+    state.selected_id = "first"
+    before = state.screen.to_json()
+    appearance = {
+        "width": "fixed",
+        "width_px": 320,
+        "font_size": 32,
+        "font_weight": "700",
+        "foreground": "accent",
+        "margin": 8,
+    }
+    state.update_selected("Custom heading", {"text": "Assembly"}, appearance=appearance)
+    state.edit(
+        lambda screen: setattr(
+            screen,
+            "design",
+            ScreenDesign(mode="light", accent="#126647", font="System"),
+        )
+    )
+    restored = Screen.from_json(state.screen.to_json())
+    assert find(restored.root, "first").appearance.width_px == 320
+    assert restored.design.mode == "light"
+    state.history()
+    assert state.screen.design == ScreenDesign()
+    state.history()
+    assert state.screen.to_json() == before
+
+
+def test_structural_edit_breaks_typing_group_and_does_not_merge_undo_steps():
+    state = EditorState(simple_screen())
+    state.selected_id = "first"
+    state.update_selected("Heading", {"text": "One"}, group="first.text")
+    state.add("input", "root")
+    added = state.selected_id
+    state.selected_id = "first"
+    state.update_selected("Heading", {"text": "Two"}, group="first.text")
+    state.history()
+    assert find(state.screen.root, "first").props["text"] == "One"
+    assert find(state.screen.root, added).kind == "input"
+    state.history()
+    with pytest.raises(ValueError):
+        find(state.screen.root, added)
+
+
+def test_responsive_grid_settings_round_trip_and_reject_invalid_columns():
+    node = Node(
+        kind="grid",
+        props={"columns": 3, "mobile_columns": 1, "justify": "center", "wrap": False},
+    )
+    screen = Screen(root=node)
+    restored = Screen.from_json(screen.to_json())
+    assert restored.root.props == node.props
+    with pytest.raises(ValueError):
+        Node(kind="grid", props={"mobile_columns": 0})
 
 
 @pytest.mark.parametrize(
