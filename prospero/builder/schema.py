@@ -26,6 +26,36 @@ class LayoutProperties(Properties):
     padding: int = Field(default=16, ge=0, le=64)
     columns: int = Field(default=2, ge=1, le=6)
     align: Literal["stretch", "start", "center", "end"] = "stretch"
+    justify: Literal["start", "center", "end", "space-between", "space-around"] = (
+        "start"
+    )
+    wrap: bool = True
+    mobile_columns: int | None = Field(default=None, ge=1, le=6)
+
+
+class Appearance(Properties):
+    """Typed appearance controls; screen files never contain executable CSS."""
+
+    width: Literal["default", "fill", "content", "fixed"] = "default"
+    width_px: int = Field(default=240, ge=24, le=3840)
+    min_height: int = Field(default=0, ge=0, le=2160)
+    margin: int = Field(default=0, ge=0, le=96)
+    padding: int | None = Field(default=None, ge=0, le=96)
+    radius: int | None = Field(default=None, ge=0, le=48)
+    font_size: int | None = Field(default=None, ge=8, le=96)
+    font_weight: Literal["inherit", "400", "500", "600", "700"] = "inherit"
+    text_align: Literal["inherit", "left", "center", "right"] = "inherit"
+    foreground: Literal[
+        "inherit", "text", "muted", "accent", "positive", "negative", "warning"
+    ] = "inherit"
+    surface: Literal["inherit", "base", "panel"] = "inherit"
+    border: bool = False
+
+
+class ScreenDesign(Properties):
+    mode: Literal["dark", "light"] = "dark"
+    accent: str = Field(default="#2f7dfa", pattern=r"^#[0-9a-fA-F]{6}$")
+    font: Literal["Arial", "System", "Georgia"] = "Arial"
 
 
 class TextProperties(Properties):
@@ -96,6 +126,7 @@ class Node(BaseModel):
     kind: Kind
     name: str = Field(default="", max_length=100)
     props: dict = Field(default_factory=dict)
+    appearance: Appearance = Field(default_factory=Appearance)
     children: list[Node] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -110,6 +141,7 @@ class Screen(BaseModel):
     model_config = ConfigDict(extra="forbid")
     version: Literal[1] = 1
     name: str = Field(default="Untitled station", min_length=1, max_length=100)
+    design: ScreenDesign = Field(default_factory=ScreenDesign)
     root: Node = Field(default_factory=lambda: Node(kind="column", name="Screen"))
 
     @model_validator(mode="after")
@@ -213,26 +245,34 @@ class EditorState:
         self.selected_id = self.screen.root.id
         self.undo_stack: list[str] = []
         self.redo_stack: list[str] = []
+        self._edit_group: str | None = None
 
     @property
     def selected(self) -> Node:
         return find(self.screen.root, self.selected_id)
 
-    def replace(self, screen: Screen) -> None:
+    def replace(self, screen: Screen, *, group: str | None = None) -> None:
         validated = Screen.model_validate(screen.model_dump())
         before = self.screen.to_json()
         if validated.to_json() == before:
             return
-        self.undo_stack = (self.undo_stack + [before])[-50:]
+        if group is None or group != self._edit_group:
+            self.undo_stack = (self.undo_stack + [before])[-50:]
+        self._edit_group = group
         self.redo_stack.clear()
         self.screen = validated
         if not any(node.id == self.selected_id for node in walk(validated.root)):
             self.selected_id = validated.root.id
 
-    def edit(self, change: Callable[[Screen], None]) -> None:
+    def edit(
+        self, change: Callable[[Screen], None], *, group: str | None = None
+    ) -> None:
         candidate = self.screen.model_copy(deep=True)
         change(candidate)
-        self.replace(candidate)
+        self.replace(candidate, group=group)
+
+    def end_edit_group(self) -> None:
+        self._edit_group = None
 
     def add(self, kind: str, parent_id: str, index: int | None = None) -> None:
         node = Node(kind=kind)
@@ -294,6 +334,7 @@ class EditorState:
         self.selected_id = clone.id
 
     def history(self, *, redo: bool = False) -> None:
+        self.end_edit_group()
         source, target = (
             (self.redo_stack, self.undo_stack)
             if redo
@@ -304,12 +345,21 @@ class EditorState:
             self.screen = Screen.from_json(source.pop())
             self.selected_id = self.screen.root.id
 
-    def update_selected(self, name: str, props: dict) -> None:
+    def update_selected(
+        self,
+        name: str,
+        props: dict,
+        *,
+        appearance: dict | None = None,
+        group: str | None = None,
+    ) -> None:
         def change(screen: Screen) -> None:
             node = find(screen.root, self.selected_id)
             node.name, node.props = name, props
+            if appearance is not None:
+                node.appearance = Appearance.model_validate(appearance)
 
-        self.edit(change)
+        self.edit(change, group=group)
 
 
 def json_literal(value: object) -> str:

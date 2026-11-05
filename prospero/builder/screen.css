@@ -1,0 +1,10 @@
+.p-rendered-screen {
+    width: 100%; min-width: 0; box-sizing: border-box;
+    container-type: inline-size; container-name: prospero-screen;
+    background: var(--p-bg); color: var(--p-text); font-family: var(--p-font);
+}
+.p-rendered-screen *, .p-rendered-screen *::before, .p-rendered-screen *::after { box-sizing: border-box; }
+.p-screen-grid { grid-template-columns: repeat(var(--p-columns), minmax(0, 1fr)); }
+@container prospero-screen (max-width: 600px) {
+    .p-screen-grid { grid-template-columns: repeat(var(--p-mobile-columns), minmax(0, 1fr)); }
+}
